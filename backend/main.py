@@ -1,0 +1,232 @@
+"""FastAPI backend for the Campus Customs agent team and its dashboard.
+
+Start from the backend folder, so the dashboard can call http://localhost:8000:
+
+    uvicorn main:app --reload --port 8000
+
+Agent routes start runs and read their events. Only the human routes below change cash:
+approve, reject, desk date, and reset. Agents never have access to these routes or to the
+functions behind them.
+"""
+
+from __future__ import annotations
+
+import sys
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Any, AsyncIterator, Literal
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:  # lets `uvicorn main:app` run from backend/ and still import mcp_server and backend.*
+    sys.path.insert(0, str(ROOT))
+
+from fastapi import FastAPI, HTTPException, Query  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
+
+from backend.agents.team import AgentTeam  # noqa: E402
+from backend.models import (  # noqa: E402
+    ActivityEvent,
+    ApprovalDecision,
+    CashBalance,
+    ResetResult,
+    TicketSummary,
+)
+from mcp_server import shop  # noqa: E402
+
+
+class RejectBody(BaseModel):
+    reason: str = ""
+
+
+class DeskDateBody(BaseModel):
+    date: str
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    team = AgentTeam()
+    await team.start()
+    app.state.team = team
+    try:
+        yield
+    finally:
+        await team.stop()
+
+
+app = FastAPI(title="Campus Customs agent team", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Vite dev server for the dashboard
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+def _team() -> AgentTeam:
+    return app.state.team
+
+
+def _guard_idle() -> None:
+    if _team().busy:
+        raise HTTPException(status_code=409, detail="The agent team is running. Wait for the current run to finish.")
+
+
+def _shop_call(fn: Any, *args: Any, **kwargs: Any) -> Any:
+    try:
+        return fn(*args, **kwargs)
+    except shop.ShopError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+def _summary(ticket: dict[str, Any]) -> TicketSummary:
+    return TicketSummary(
+        id=ticket["id"],
+        type=ticket["type"],
+        requester=ticket["requester"],
+        subject=ticket["subject"],
+        status=ticket["status"],
+        state=(
+            "resolved" if ticket["status"] == "resolved"
+            else "blocked" if ticket["status"] == "blocked"
+            else "open"
+        ),
+        overdue=ticket["overdue"],
+        pending_approvals=ticket["pending_approvals"],
+    )
+
+
+# --- Health and board -------------------------------------------------------
+
+
+@app.get("/api/health")
+def health() -> dict[str, Any]:
+    return {"ok": True, "working_db": shop.working_db_path().name, "model": _team().model_name, "busy": _team().busy}
+
+
+@app.get("/api/tickets", response_model=list[TicketSummary])
+def list_tickets() -> list[TicketSummary]:
+    """Every ticket on the board, each marked open or resolved."""
+    return [_summary(t) for t in shop.list_tickets()]
+
+
+@app.get("/api/tickets/{ticket_id}")
+def ticket_detail(ticket_id: int) -> dict[str, Any]:
+    """One ticket in full: linked lease or invoice, stock, drafts, approvals, purchase orders, and notes."""
+    return _shop_call(shop.get_ticket, ticket_id)
+
+
+# --- Agent runs and events --------------------------------------------------
+
+
+class NoteBody(BaseModel):
+    note: str
+
+
+@app.post("/api/tickets/{ticket_id}/notes")
+def add_note(ticket_id: int, body: NoteBody) -> dict[str, Any]:
+    """A human adds information to a ticket, such as the target price for a discount. The next run reads it."""
+    return _shop_call(shop.add_human_note, ticket_id, body.note)
+
+
+@app.post("/api/tickets/{ticket_id}/run", status_code=202)
+async def run_ticket(ticket_id: int) -> dict[str, Any]:
+    """Start the agent team on one ticket. Returns at once; poll /api/events and /api/tickets for progress."""
+    _guard_idle()
+    ticket = _shop_call(shop.get_ticket, ticket_id)
+    if ticket["status"] == "resolved":
+        raise HTTPException(status_code=400, detail=f"Ticket {ticket_id} is already resolved")
+    _team().launch([ticket_id])
+    return {"ticket_id": ticket_id, "started": True}
+
+
+@app.get("/api/events", response_model=list[ActivityEvent])
+def events(
+    ticket_id: int | None = None,
+    after: int = Query(0, description="Return only events with an id greater than this"),
+    limit: int = Query(200, le=500),
+) -> list[ActivityEvent]:
+    """Recent agent events, oldest first: what each agent said (message), which tools it used (tool_call, tool_result), delegations, and decisions."""
+    return [ActivityEvent(**row) for row in shop.list_activity(ticket_id=ticket_id, after=after, limit=limit)]
+
+
+# --- Human approvals (these change cash) ------------------------------------
+
+
+def _rerun_after_decision(approval_id: int) -> int | None:
+    """A human decision on a ticket starts the team on that ticket, so it acts on the decision right away."""
+    approval = next((a for a in shop.list_approvals() if a["id"] == approval_id), None)
+    if approval is None or approval["ticket_id"] is None:
+        return None
+    if shop.get_ticket(approval["ticket_id"])["status"] == "resolved":
+        return None
+    _team().request_run(approval["ticket_id"])
+    return approval["ticket_id"]
+
+
+@app.get("/api/approvals")
+def approvals(status: Literal["pending", "approved", "rejected"] | None = None) -> list[dict[str, Any]]:
+    return shop.list_approvals(status=status)
+
+
+@app.post("/api/approvals/{approval_id}/approve", response_model=ApprovalDecision)
+async def approve(approval_id: int) -> ApprovalDecision:
+    """A human clicks approve. The payment or purchase executes now, and this is the only route that changes cash.
+    Refuses (409) if cash cannot cover a payment; the request stays pending with the reason."""
+    result = shop.approve_approval(approval_id, decided_by="human")
+    if not result["ok"]:
+        raise HTTPException(status_code=409, detail=result["error"])
+    rerun = _rerun_after_decision(approval_id)
+    return ApprovalDecision(approval_id=approval_id, status="approved", result=result["result"], rerun_ticket_id=rerun)
+
+
+class AnswerBody(BaseModel):
+    answer: str
+
+
+@app.post("/api/approvals/{approval_id}/answer", response_model=ApprovalDecision)
+async def answer(approval_id: int, body: AnswerBody) -> ApprovalDecision:
+    """A human answers a question Boss asked with ask_human. The ticket runs again with the answer."""
+    result = _shop_call(shop.answer_question, approval_id, body.answer, decided_by="human")
+    rerun = _rerun_after_decision(approval_id)
+    return ApprovalDecision(approval_id=approval_id, status="approved", result=result["result"], rerun_ticket_id=rerun)
+
+
+@app.post("/api/approvals/{approval_id}/reject", response_model=ApprovalDecision)
+async def reject(approval_id: int, body: RejectBody) -> ApprovalDecision:
+    _shop_call(shop.reject_approval, approval_id, reason=body.reason, decided_by="human")
+    rerun = _rerun_after_decision(approval_id)
+    return ApprovalDecision(approval_id=approval_id, status="rejected", result=body.reason or "rejected", rerun_ticket_id=rerun)
+
+
+# --- Cash and desk ----------------------------------------------------------
+
+
+@app.get("/api/cash/balance", response_model=CashBalance)
+def cash_balance() -> CashBalance:
+    """Current balance of the checking account, read from cash_accounts."""
+    cash = shop.get_cash()
+    return CashBalance(
+        account=cash["name"],
+        balance=cash["balance"],
+        date=cash["date"],
+        pending_payments=cash["pending_payments"],
+        available_after_pending=cash["available_after_pending"],
+    )
+
+
+@app.post("/api/desk/date")
+def set_desk_date(body: DeskDateBody) -> dict[str, Any]:
+    """Move the shop's 'today' forward. Shipments whose ETA has arrived are received."""
+    _guard_idle()
+    return _shop_call(shop.set_desk_date, body.date, decided_by="human")
+
+
+# --- Reset ------------------------------------------------------------------
+
+
+@app.post("/api/reset", response_model=ResetResult)
+def reset() -> ResetResult:
+    """Replace the working copy with the original database. The original file is only read, never written."""
+    _guard_idle()
+    return ResetResult(**_shop_call(shop.reset_working_copy))

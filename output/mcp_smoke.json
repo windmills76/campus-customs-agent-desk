@@ -1,0 +1,261 @@
+{
+  "server": "campus-customs",
+  "connection_file": ".mcp.json",
+  "transport": "stdio, launched from .mcp.json",
+  "database": "data/campus_customs_new.db",
+  "run_at": "2026-10-10T13:52:35",
+  "tools_registered": [
+    "add_ticket_note",
+    "ask_human",
+    "check_inventory_stock",
+    "create_draft",
+    "fulfill_order",
+    "get_cash",
+    "get_desk",
+    "get_lease_rent_status",
+    "get_pricing",
+    "get_ticket",
+    "list_approvals",
+    "list_invoices",
+    "list_leases",
+    "list_open_vendor_invoices",
+    "list_payments",
+    "list_tickets",
+    "list_vendors",
+    "margin_check",
+    "overdue_report",
+    "request_discount_approval",
+    "request_invoice_payment",
+    "request_purchase_order",
+    "request_rent_payment",
+    "restock_options"
+  ],
+  "tests": [
+    {
+      "ticket": 103,
+      "prompt": "A customer wants 20 size M Basic Hoodie Big Yale (CC-HOOD-NAVY). How many do we have, and how many are short?",
+      "tool": "check_inventory_stock",
+      "arguments": {
+        "sku": "CC-HOOD-NAVY",
+        "size": "M",
+        "qty_needed": 20
+      },
+      "tool_output": {
+        "sku": "CC-HOOD-NAVY",
+        "name": "Basic Hoodie Big Yale",
+        "size": "M",
+        "on_hand": 8,
+        "qty_needed": 20,
+        "shortfall": 12,
+        "location": "Aisle A"
+      },
+      "database_row": {
+        "sku": "CC-HOOD-NAVY",
+        "name": "Basic Hoodie Big Yale",
+        "size": "M",
+        "qty": 8,
+        "location": "Aisle A"
+      },
+      "checks": [
+        {
+          "field": "sku",
+          "tool_value": "CC-HOOD-NAVY",
+          "database_value": "CC-HOOD-NAVY",
+          "match": true
+        },
+        {
+          "field": "name",
+          "tool_value": "Basic Hoodie Big Yale",
+          "database_value": "Basic Hoodie Big Yale",
+          "match": true
+        },
+        {
+          "field": "size",
+          "tool_value": "M",
+          "database_value": "M",
+          "match": true
+        },
+        {
+          "field": "on_hand",
+          "tool_value": 8,
+          "database_value": 8,
+          "match": true
+        },
+        {
+          "field": "shortfall",
+          "tool_value": 12,
+          "database_value": 12,
+          "match": true
+        },
+        {
+          "field": "location",
+          "tool_value": "Aisle A",
+          "database_value": "Aisle A",
+          "match": true
+        }
+      ],
+      "all_match_database": true
+    },
+    {
+      "ticket": 101,
+      "prompt": "Which vendor invoices are still unpaid, and is any of them past due?",
+      "tool": "list_open_vendor_invoices",
+      "arguments": {},
+      "tool_output": {
+        "desk_date": "2026-08-31",
+        "open_invoices": [
+          {
+            "invoice_id": 501,
+            "vendor_id": 1,
+            "vendor_name": "Bulldog Print Co",
+            "lead_days": 5,
+            "amount": 840.0,
+            "due_date": "2026-08-28",
+            "overdue": true,
+            "days_past_due": 3,
+            "description": "Rush reprint CC-TEE-WHITE S"
+          }
+        ],
+        "vendor_ids_blocked_from_shipping": [
+          1
+        ]
+      },
+      "database_row": {
+        "id": 501,
+        "vendor_id": 1,
+        "vendor_name": "Bulldog Print Co",
+        "lead_days": 5,
+        "amount": 840.0,
+        "due_date": "2026-08-28"
+      },
+      "checks": [
+        {
+          "field": "desk_date",
+          "tool_value": "2026-08-31",
+          "database_value": "2026-08-31",
+          "match": true
+        },
+        {
+          "field": "open_invoice_count",
+          "tool_value": 1,
+          "database_value": 1,
+          "match": true
+        },
+        {
+          "field": "invoice_id",
+          "tool_value": 501,
+          "database_value": 501,
+          "match": true
+        },
+        {
+          "field": "vendor_name",
+          "tool_value": "Bulldog Print Co",
+          "database_value": "Bulldog Print Co",
+          "match": true
+        },
+        {
+          "field": "lead_days",
+          "tool_value": 5,
+          "database_value": 5,
+          "match": true
+        },
+        {
+          "field": "amount",
+          "tool_value": 840.0,
+          "database_value": 840.0,
+          "match": true
+        },
+        {
+          "field": "due_date",
+          "tool_value": "2026-08-28",
+          "database_value": "2026-08-28",
+          "match": true
+        },
+        {
+          "field": "days_past_due",
+          "tool_value": 3,
+          "database_value": 3,
+          "match": true
+        },
+        {
+          "field": "vendor_ids_blocked_from_shipping",
+          "tool_value": [
+            1
+          ],
+          "database_value": [
+            1
+          ],
+          "match": true
+        }
+      ],
+      "all_match_database": true
+    },
+    {
+      "ticket": 102,
+      "prompt": "When is the rent due on lease 1 (Chapel Street shop), and is it overdue?",
+      "tool": "get_lease_rent_status",
+      "arguments": {
+        "lease_id": 1
+      },
+      "tool_output": {
+        "lease_id": 1,
+        "space_name": "Chapel Street shop",
+        "landlord": "Elm City Properties",
+        "monthly_rent": 2400.0,
+        "next_due": "2026-09-02",
+        "desk_date": "2026-08-31",
+        "days_until_due": 2,
+        "overdue": false,
+        "notes": null
+      },
+      "database_row": {
+        "id": 1,
+        "space_name": "Chapel Street shop",
+        "landlord": "Elm City Properties",
+        "monthly_rent": 2400.0,
+        "next_due": "2026-09-02",
+        "notes": null
+      },
+      "checks": [
+        {
+          "field": "space_name",
+          "tool_value": "Chapel Street shop",
+          "database_value": "Chapel Street shop",
+          "match": true
+        },
+        {
+          "field": "landlord",
+          "tool_value": "Elm City Properties",
+          "database_value": "Elm City Properties",
+          "match": true
+        },
+        {
+          "field": "monthly_rent",
+          "tool_value": 2400.0,
+          "database_value": 2400.0,
+          "match": true
+        },
+        {
+          "field": "next_due",
+          "tool_value": "2026-09-02",
+          "database_value": "2026-09-02",
+          "match": true
+        },
+        {
+          "field": "days_until_due",
+          "tool_value": 2,
+          "database_value": 2,
+          "match": true
+        },
+        {
+          "field": "overdue",
+          "tool_value": false,
+          "database_value": false,
+          "match": true
+        }
+      ],
+      "all_match_database": true
+    }
+  ],
+  "all_passed": true
+}

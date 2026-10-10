@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs: resolved board (Problem 9)</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; background: #eef4fc; color: #1d1d1f; }
+  header { padding: 28px 36px 8px; }
+  h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.02em; color: #0b2a5b; }
+  header p { margin: 0; color: #6e6e73; max-width: 920px; line-height: 1.5; }
+  main { padding: 16px 36px 48px; display: grid; gap: 28px; }
+  figure { margin: 0; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(11,42,91,.08); padding: 18px; }
+  figure img { width: 100%; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(10,42,91,.08); }
+  figcaption { padding: 14px 6px 4px; font-size: 15px; line-height: 1.5; }
+  figcaption b { color: #0b2a5b; font-size: 17px; }
+  .resolved { color: #137a3a; font-weight: 700; }
+  .blocked { color: #d70015; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Campus Customs: the board after the full run</h1>
+  <p>Screenshots of the React desk, one per ticket, each taken with that ticket selected. Checking is <b>$152.00</b> at the end of the run, matching <code>cash_accounts</code>. Tickets 101 and 102 are resolved. Ticket 103 is blocked, not resolved: the restock cannot be paid with the checking balance on hand.</p>
+</header>
+<main>
+  <figure>
+    <img src="resolved_board_images/ticket_101.png" alt="Campus Customs desk with ticket 101 selected, showing it resolved">
+    <figcaption><b>Ticket 101: Bulldog tee for Tauhid Zaman. <span class="resolved">Resolved.</span></b><br>
+      Invoice 501 ($840) paid, PO #1 for one tee ($8.00) received 2026-09-05, fulfilled from stock, pickup draft #2 saved and not sent. Approvals #1 and #4.</figcaption>
+  </figure>
+  <figure>
+    <img src="resolved_board_images/ticket_102.png" alt="Campus Customs desk with ticket 102 selected, showing it resolved">
+    <figcaption><b>Ticket 102: Rent due for Chapel Street shop. <span class="resolved">Resolved.</span></b><br>
+      Rent of $2,400 paid after approval #2. Next due date moved from 2026-09-02 to 2026-10-02.</figcaption>
+  </figure>
+  <figure>
+    <img src="resolved_board_images/ticket_103.png" alt="Campus Customs desk with ticket 103 selected, showing it blocked">
+    <figcaption><b>Ticket 103: Bulk hoodie discount for Yale AI Club. <span class="blocked">Blocked.</span></b><br>
+      Discount approved at $29.33 (approval #5). Invoice 502 ($8.00) paid under approval #6. The 12-hoodie restock ($264.00, approval #7) was declined, and checking ($152.00) cannot cover that invoice.</figcaption>
+  </figure>
+</main>
+</body>
+</html>

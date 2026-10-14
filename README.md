@@ -38,9 +38,21 @@ output/
   github_url.txt       The repository URL
 ```
 
-## Setup (once)
+## Quick start (recommended)
 
-Requirements: Python 3 (built and tested with 3.14) and Node (built and tested with 24).
+From a fresh clone, on macOS or Linux:
+
+```bash
+bash scripts/setup_and_check.sh
+```
+
+This creates the Python environment, installs the dashboard, restores the working database to the original values, and runs the tests and the MCP check. Expected last lines: `32 passed` (or more) and two or more `MATCH` lines, then `Setup and checks passed.`
+
+Before the agents can run, put your key in `.env`: `PORTKEY_API_KEY=...`.
+
+## Setup (manual)
+
+Requirements: Python 3 (built and tested with 3.14) and Node 24 (see `.nvmrc`).
 
 ```bash
 # 1. Python environment, from the project root
@@ -112,3 +124,15 @@ All agents use `gpt-6-luna` through the Portkey gateway, with `PORTKEY_API_KEY` 
 - Desk date and cash are simulated. The homework has no revenue, so checking can only go down.
 - Ticket 103 can't resolve with a restock on this budget. It ends blocked, and the reflection in `output/desk_tickets.html` explains why.
 - Model calls cost money. Each human decision starts a run, so a busy session uses more of the budget.
+
+## Expected results (for checking a run)
+
+Starting point: checking $3,400.00, tickets 101, 102, and 103 open.
+
+- **Ticket 101:** pays invoice 501 ($840.00) after approval, requests an $8.00 purchase order, and resolves once the tee is fulfilled.
+- **Ticket 102:** pays rent ($2,400.00) after approval and resolves. The next due date moves to 2026-10-02.
+- **Ticket 103:** ends blocked. A $264.00 restock cannot be paid with the cash on hand.
+- **Ending checking:** $152.00, from $3,400.00 minus $840.00, $2,400.00, and $8.00.
+
+Agent wording and the exact number of runs will differ between runs. The approvals and the ending balance should match. The full record of the original run is in `output/`.
+

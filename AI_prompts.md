@@ -323,3 +323,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** the reflection, cash tab, board captions, and run record still described the original run (101 resolved, checking $152.00) rather than the kept session, and the approved $29.34 discount price had not been checked against the earlier $29.33.
 
+### Follow-up 20: Discount price
+
+> keep at 29.33
+
+**What was lacking:** the approved discount in the working database is recorded at $29.34 (approvals #5 and #6), so the documents and the database disagree.
+

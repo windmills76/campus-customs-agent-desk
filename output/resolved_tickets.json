@@ -179,7 +179,7 @@
       "subject": "Bulk hoodie discount",
       "final_status": "blocked",
       "state": "blocked",
-      "short_outcome": "Blocked, not resolved. A discount at $29.34 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
+      "short_outcome": "Blocked, not resolved. A discount at $29.33 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
       "final_team_decision": "Blocked, not resolved. A discount at $29.34 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
       "agents_contributed": {
         "boss": {

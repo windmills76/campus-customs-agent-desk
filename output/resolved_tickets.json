@@ -279,6 +279,16 @@
           "decided_at": "2026-10-14T11:48:26",
           "summary": "Discount 20 x CC-HOOD-NAVY (M) to $29.34 each (list $58.00, margin 25.02%)",
           "result": "approved (duplicate of #5)"
+        },
+        {
+          "approval_id": 7,
+          "kind": "discount",
+          "amount": 0.0,
+          "status": "approved",
+          "decided_by": "human",
+          "decided_at": "2026-10-14T12:53:29",
+          "summary": "Discount 20 x CC-HOOD-NAVY (M) to $29.33 each (list $58.00, margin 24.99%)",
+          "result": "approved at $29.33"
         }
       ]
     }

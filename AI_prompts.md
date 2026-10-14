@@ -329,3 +329,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** the approved discount in the working database is recorded at $29.34 (approvals #5 and #6), so the documents and the database disagree.
 
+### Follow-up 21: Approve the $29.33 discount
+
+> approved 7
+
+**Not a correction.**
+

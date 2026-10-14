@@ -63,4 +63,4 @@ The agent team starts the server itself. To run it by hand from the project root
 python -m mcp_server.server
 ```
 
-`tests/mcp_smoke.py` launches the server exactly as `.mcp.json` describes, calls the three lookup tools, and checks each result against the database.
+`backend/mcp_smoke_test.py` launches the server exactly as `.mcp.json` describes, calls the three lookup tools, and checks each result against the database.

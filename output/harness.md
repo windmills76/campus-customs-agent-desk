@@ -320,7 +320,7 @@ Routes are in `backend/main.py`. The dashboard calls them at http://localhost:80
 
 ## The dashboard
 
-`frontend/` is React 19, Vite 8, and TypeScript 5.9. `npm run dev` opens it at http://localhost:5173. It polls the routes above. The board shows three tickets with states Open, Blocked, or Resolved. Each ticket has the team's five agents as cards, a live timeline, a summary of what each agent did, a note box, and the approvals waiting for a decision. The checking balance is always in the top bar. Opening `http://localhost:5173/?ticket=101` selects that ticket directly. The screenshots in `output/resolved_board_images/` were made this way.
+`frontend/` is React 19, Vite 8, and TypeScript 5.9. `npm run dev` opens it at http://localhost:5173. It polls the routes above. The board shows three tickets with states Open, Blocked, or Resolved. Each ticket has the team's five agents as cards, a live timeline, a summary of what each agent did, a note box, and the approvals waiting for a decision. The checking balance is always in the top bar. Opening `http://localhost:5173/?ticket=101` selects that ticket directly. The screenshots `output/ticket_101.png`, `ticket_102.png`, and `ticket_103.png` were made this way.
 
 ## Safety rules
 

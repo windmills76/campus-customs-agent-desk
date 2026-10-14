@@ -4,7 +4,7 @@ Reads the server definition from .mcp.json, launches it exactly as that file say
 calls each of the three tools with a prompt, and checks every output against a separate
 read-only query on data/campus_customs_new.db. Evidence is written to output/mcp_smoke.json.
 
-Run from the project root:  ./.venv/bin/python tests/mcp_smoke.py
+Run from the project root:  ./.venv/bin/python backend/mcp_smoke_test.py
 """
 
 from __future__ import annotations

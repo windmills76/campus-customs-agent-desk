@@ -3,7 +3,7 @@
   "connection_file": ".mcp.json",
   "transport": "stdio, launched from .mcp.json",
   "database": "data/campus_customs_new.db",
-  "run_at": "2026-10-14T11:15:36",
+  "run_at": "2026-10-14T11:20:08",
   "tools_registered": [
     "add_ticket_note",
     "ask_human",

@@ -281,3 +281,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **Not a correction.**
 
+### Follow-up 13: Final outcome for ticket 103
+
+> i think 7 is now functional. write blocked in final outcome because we can't resolve it without additional inventory. should we maybe think about this as asking another agent to order more inventory and then we can mark it as pending incoming inventory?
+
+**What was lacking:** the final outcome for ticket 103 was still recorded as resolved in the live session, and the question about pending incoming inventory was not answered.
+

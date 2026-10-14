@@ -340,8 +340,8 @@ These are enforced in code, not only in the prompts:
 - Reset to the original values. Starting checking balance: $3,400.00.
 - Fourteen team runs in the original run: ticket 101 three times, 102 twice, 103 nine times. Testing after Problem 11 added more runs, all in `output/audit_trail.json`. Events are in `output/audit_trail.json` (JSON lines, one event per line).
 - Seven requests: six approved (three payments, one purchase order, one discount, one answered question) and one declined (purchase order #7). Details are in `output/resolved_tickets.json`.
-- Ticket 101: resolved. Ticket 102: resolved. Ticket 103: blocked.
-- Checking ends at $152.00. The cash itemization is on the cash tab of `output/desk_tickets.html`.
+- Ticket 101: payments resolved; pending inventory arriving to be fulfilled (not resolved). Ticket 102: resolved. Ticket 103: blocked.
+- Checking ends at $160.00 in the kept session (invoice 501 and rent paid). The original run ended at $152.00 after an $8.00 bill was paid on arrival.00. The cash itemization is on the cash tab of `output/desk_tickets.html`.
 - Known issue: a decision recorded after an approval executes during a run can overwrite the ticket's status. This happened on tickets 101 and 103 and is described in the reflection tab.
 
 ## Latest changes (testing, after Problem 11)

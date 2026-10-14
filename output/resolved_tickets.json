@@ -5,7 +5,7 @@
   ],
   "desk_date": "2026-09-05",
   "checking_start": 3400.0,
-  "checking_end": 152.0,
+  "checking_end": 160.0,
   "checking_end_matches_cash_accounts": true,
   "payments": [
     {
@@ -23,24 +23,16 @@
       "amount": 2400.0,
       "paid_at": "2026-08-31",
       "approved_by": "human"
-    },
-    {
-      "id": 3,
-      "kind": "invoice",
-      "ref_id": 502,
-      "amount": 8.0,
-      "paid_at": "2026-09-05",
-      "approved_by": "human"
     }
   ],
   "tickets": [
     {
       "ticket_id": 101,
       "subject": "Bulldog tee",
-      "final_status": "resolved",
-      "state": "resolved",
-      "short_outcome": "Resolved. Invoice 501 ($840) paid so Bulldog could ship. PO #1 (1 tee, $8.00) placed with ETA 2026-09-05 and received that day. Tee fulfilled from stock; pickup draft #2 written and not sent.",
-      "final_team_decision": "resolved: Ticket 101: PO #1 was received on 2026-09-05, providing 1 CC-TEE-WHITE size S for the 1-unit order; inventory fulfilled it, leaving 0 in stock. Customer Service created pickup draft #2, which remains unsent; no approval is pending.",
+      "final_status": "waiting_stock",
+      "state": "waiting",
+      "short_outcome": "Payment resolved: invoice 501 ($840.00) paid (approval #1), and the purchase order for one tee ($8.00, approval #2) is placed with ETA 2026-09-05. The ticket is pending inventory arriving to be fulfilled; it is not resolved.",
+      "final_team_decision": "Payment resolved: invoice 501 ($840.00) paid (approval #1), and the purchase order for one tee ($8.00, approval #2) is placed with ETA 2026-09-05. The ticket is pending inventory arriving to be fulfilled; it is not resolved.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 7,
@@ -108,19 +100,19 @@
           "amount": 840.0,
           "status": "approved",
           "decided_by": "human",
-          "decided_at": "2026-10-10T13:16:50",
+          "decided_at": "2026-10-14T11:37:59",
           "summary": "Pay invoice #501 (Rush reprint CC-TEE-WHITE S) $840.00",
-          "result": "paid invoice #501 $840.00; cash now $2560.00"
+          "result": "paid invoice #501 $840.00"
         },
         {
-          "approval_id": 4,
+          "approval_id": 2,
           "kind": "purchase_order",
           "amount": 8.0,
           "status": "approved",
           "decided_by": "human",
-          "decided_at": "2026-10-10T13:17:58",
+          "decided_at": "2026-10-14T11:39:12",
           "summary": "Order 1 x CC-TEE-WHITE (S) from Bulldog Print Co at $8.00, total $8.00, ETA 2026-09-05",
-          "result": "placed PO #1 with Bulldog Print Co; ETA 2026-09-05"
+          "result": "placed PO #1, ETA 2026-09-05"
         }
       ]
     },
@@ -129,8 +121,8 @@
       "subject": "Rent due",
       "final_status": "resolved",
       "state": "resolved",
-      "short_outcome": "Resolved. Lease 1 rent ($2,400) paid after approval #2; next due moved from 2026-09-02 to 2026-10-02.",
-      "final_team_decision": "resolved: Ticket 102: Lease 1 rent of $2,400 was paid after human approval #2; the next due date advanced to 2026-10-02, which is 32 days after the desk date 2026-08-31, and rent is not overdue.",
+      "short_outcome": "Resolved. Rent of $2,400.00 paid after approval #3; next due date moved from 2026-09-02 to 2026-10-02.",
+      "final_team_decision": "Resolved. Rent of $2,400.00 paid after approval #3; next due date moved from 2026-09-02 to 2026-10-02.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 4,
@@ -171,14 +163,14 @@
       },
       "human_approvals": [
         {
-          "approval_id": 2,
+          "approval_id": 3,
           "kind": "rent_payment",
           "amount": 2400.0,
           "status": "approved",
           "decided_by": "human",
-          "decided_at": "2026-10-10T13:16:52",
+          "decided_at": "2026-10-14T11:42:39",
           "summary": "Pay rent for Chapel Street shop to Elm City Properties $2400.00 (due 2026-09-02)",
-          "result": "paid rent $2400.00 for Chapel Street shop; next due 2026-10-02"
+          "result": "paid rent $2400.00; next due 2026-10-02"
         }
       ]
     },
@@ -187,8 +179,8 @@
       "subject": "Bulk hoodie discount",
       "final_status": "blocked",
       "state": "blocked",
-      "short_outcome": "Blocked, not resolved. $29.33 price approved (discount #5). Restock of 12 hoodies not possible: invoice 502 ($8.00) paid under approval #6, but the PO for $264.00 (approval #7) was declined, and checking ($152.00) could not cover that invoice anyway. Drafts #1, #3, #4 to Yale AI Club, none sent.",
-      "final_team_decision": "blocked: Ticket 103: the approved $29.33 unit price is in place, but only 8 of 20 CC-HOOD-NAVY size M hoodies are on hand, leaving 12 to restock. The prior $264.00 purchase order request (approval #7) was rejected; there is no PO or pending approval, so the order cannot proceed without a new human-approved PO request.",
+      "short_outcome": "Blocked, not resolved. A discount at $29.34 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
+      "final_team_decision": "Blocked, not resolved. A discount at $29.34 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 29,
@@ -259,14 +251,14 @@
       },
       "human_approvals": [
         {
-          "approval_id": 3,
+          "approval_id": 4,
           "kind": "question",
           "amount": 0.0,
           "status": "approved",
           "decided_by": "human",
-          "decided_at": "2026-10-10T13:17:03",
-          "summary": "Question for the human: Ticket 103: what unit price should be offered for the 20 CC-HOOD-NAVY size M hoodies? Please specify the target price per hoodie.",
-          "result": "$28.00"
+          "decided_at": "2026-10-14T11:46:21",
+          "summary": "Question for the human: target unit price for 20 CC-HOOD-NAVY size M",
+          "result": "answered"
         },
         {
           "approval_id": 5,
@@ -274,31 +266,22 @@
           "amount": 0.0,
           "status": "approved",
           "decided_by": "human",
-          "decided_at": "2026-10-10T13:27:20",
-          "summary": "Discount 20 x CC-HOOD-NAVY (M) to $29.33 each (list $58.00, margin 25.0%)",
-          "result": "discount approved: Discount 20 x CC-HOOD-NAVY (M) to $29.33 each (list $58.00, margin 25.0%)"
+          "decided_at": "2026-10-14T11:48:19",
+          "summary": "Discount 20 x CC-HOOD-NAVY (M) to $29.34 each (list $58.00, margin 25.02%)",
+          "result": "approved"
         },
         {
           "approval_id": 6,
-          "kind": "invoice_payment",
-          "amount": 8.0,
+          "kind": "discount",
+          "amount": 0.0,
           "status": "approved",
           "decided_by": "human",
-          "decided_at": "2026-10-10T13:29:32",
-          "summary": "Pay invoice #502 (PO #1: 1 x CC-TEE-WHITE (S)) $8.00",
-          "result": "paid invoice #502 $8.00; cash now $152.00"
-        },
-        {
-          "approval_id": 7,
-          "kind": "purchase_order",
-          "amount": 264.0,
-          "status": "rejected",
-          "decided_by": "human",
-          "decided_at": "2026-10-10T13:30:14",
-          "summary": "Order 12 x CC-HOOD-NAVY (M) from Bulldog Print Co at $22.00, total $264.00, ETA 2026-09-10",
-          "result": "Declined on the desk dashboard"
+          "decided_at": "2026-10-14T11:48:26",
+          "summary": "Discount 20 x CC-HOOD-NAVY (M) to $29.34 each (list $58.00, margin 25.02%)",
+          "result": "approved (duplicate of #5)"
         }
       ]
     }
-  ]
+  ],
+  "record_basis": "Status, payments, approvals, and ending balance: kept session (working database). Agent contributions: audit trail (all runs)."
 }

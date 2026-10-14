@@ -440,41 +440,39 @@ Specialist to specialist: none expected. Possible: accounting asks Boss for the 
   <!-- ============================== CASH ============================== -->
   <section class="panel" id="cash">
     <div class="card">
-      <h2>Cash: itemized from the reset to the end of the run</h2>
-      <p class="muted" style="margin:0 0 14px">Every line is one approved payment from the payments table. Each one was approved by a human on the dashboard. Starting balance is after the reset.</p>
+      <h2>Cash: itemized, kept session</h2>
+      <p class="muted" style="margin:0 0 14px">Every payment below is one approved payment from the payments table in the working database. Each was approved by a person on the dashboard. The starting balance is after the reset.</p>
       <table>
-        <thead><tr><th>Date and time</th><th>What moved</th><th>Ticket</th><th>Approval</th><th>Money out</th><th>Checking after</th></tr></thead>
+        <thead><tr><th>Time (approval)</th><th>What moved</th><th>Ticket</th><th>Money out</th><th>Checking after</th></tr></thead>
         <tbody>
-          <tr><td>2026-08-31 (reset)</td><td>Starting checking balance, original database</td><td>—</td><td>—</td><td>—</td><td><b>$3,400.00</b></td></tr>
-          <tr><td>2026-08-31 13:16:50</td><td>Invoice 501 paid, Bulldog Print Co, rush reprint</td><td>101 (blocked its order)</td><td>#1</td><td>−$840.00</td><td>$2,560.00</td></tr>
-          <tr><td>2026-08-31 13:16:52</td><td>Rent paid, Chapel Street shop (lease 1)</td><td>102</td><td>#2</td><td>−$2,400.00</td><td>$160.00</td></tr>
-          <tr><td>2026-09-05 13:29:32</td><td>Invoice 502 paid, the $8.00 bill for PO #1 (tee, received 2026-09-05)</td><td>103 asked for it; the order belongs to 101</td><td>#6</td><td>−$8.00</td><td><b>$152.00</b></td></tr>
+          <tr><td>Reset</td><td>Starting checking balance, original database</td><td>—</td><td>—</td><td><b>$3,400.00</b></td></tr>
+          <tr><td>11:37:59 (#1)</td><td>Invoice 501 paid, Bulldog Print Co, rush reprint</td><td>101 (blocked its order)</td><td>−$840.00</td><td>$2,560.00</td></tr>
+          <tr><td>11:42:39 (#3)</td><td>Rent paid, Chapel Street shop (lease 1); next due 2026-10-02</td><td>102</td><td>−$2,400.00</td><td><b>$160.00</b></td></tr>
         </tbody>
       </table>
       <h3>Ending checking balance</h3>
-      <p>$3,400.00 − $840.00 − $2,400.00 − $8.00 = <b>$152.00</b>. This matches <code>cash_accounts</code> in <code>data/campus_customs_new.db</code> (balance 152.00, dated 2026-09-05).</p>
+      <p>$3,400.00 − $840.00 − $2,400.00 = <b>$160.00</b>. This matches <code>cash_accounts</code> in <code>data/campus_customs_new.db</code> (balance 160.00, dated 2026-08-31).</p>
 
       <h3>Requests that did not move cash</h3>
       <table>
         <thead><tr><th>Approval</th><th>Ticket</th><th>Amount</th><th>Status</th><th>Why no cash moved</th></tr></thead>
         <tbody>
-          <tr><td>#3 question</td><td>103</td><td>—</td><td>Answered $28.00, then superseded</td><td>A price answer, not a payment.</td></tr>
-          <tr><td>#4 purchase order</td><td>101</td><td>$8.00</td><td>Approved 13:17:58</td><td>Creates a PO. The $8.00 is paid later, under #6.</td></tr>
-          <tr><td>#5 discount</td><td>103</td><td>—</td><td>Approved 13:27:20</td><td>A price, not a payment.</td></tr>
-          <tr><td>#7 purchase order</td><td>103</td><td>$264.00</td><td>Rejected 13:30:14</td><td>Would have been unpayable: $152.00 in checking. If approved, the invoice at receipt could not be paid.</td></tr>
+          <tr><td>#2 purchase order (11:39:12)</td><td>101</td><td>$8.00</td><td>Approved</td><td>Creates the order only. Its $8.00 invoice is issued when the tee arrives (ETA 2026-09-05); it is not paid yet.</td></tr>
+          <tr><td>#4 question (11:46:21)</td><td>103</td><td>—</td><td>Answered</td><td>A price answer, not a payment.</td></tr>
+          <tr><td>#5 and #6 discount (11:48:19, 11:48:26)</td><td>103</td><td>—</td><td>Both approved at $29.34</td><td>Prices, not payments. Both records are identical; the second is a duplicate.</td></tr>
         </tbody>
       </table>
 
       <h3>Cash at each ticket's resolution</h3>
       <table>
-        <thead><tr><th>Ticket</th><th>Final status</th><th>Resolved at</th><th>Checking at that moment</th><th>Cash that belongs to this ticket</th></tr></thead>
+        <thead><tr><th>Ticket</th><th>Status</th><th>Checking at that point</th><th>Cash that belongs to this ticket</th></tr></thead>
         <tbody>
-          <tr><td>101</td><td>Resolved</td><td>2026-09-05 13:26:16</td><td>$160.00</td><td>−$840.00 (#1, invoice 501). The $8.00 for its PO (#6) was paid later, from checking at $160.00 down to $152.00. Resolution itself moved no cash.</td></tr>
-          <tr><td>102</td><td>Resolved</td><td>2026-08-31 13:17:36</td><td>$160.00</td><td>−$2,400.00 (#2, rent). Resolution itself moved no cash.</td></tr>
-          <tr><td>103</td><td>Blocked (not resolved)</td><td>2026-09-05 13:32:57</td><td>$152.00</td><td>−$8.00 (#6), paid to unblock the vendor. Discount #5 and PO #7 moved no cash.</td></tr>
+          <tr><td>101</td><td>Payments resolved; ticket pending inventory (not resolved). The tee arrives 2026-09-05, then it is fulfilled.</td><td>$160.00</td><td>−$840.00 (#1, invoice 501). The $8.00 for PO #2 is not paid yet.</td></tr>
+          <tr><td>102</td><td>Resolved</td><td>$160.00</td><td>−$2,400.00 (#3, rent). Resolution itself moved no cash.</td></tr>
+          <tr><td>103</td><td>Blocked (not resolved)</td><td>$160.00</td><td>None. Nothing was paid for this ticket.</td></tr>
         </tbody>
       </table>
-      <p class="muted" style="margin-top:12px">The two rows that show $8.00 are the same bill: PO #1 for ticket 101 became invoice 502, and ticket 103 requested its payment. It is counted once, in the table above.</p>
+      <p class="muted" style="margin-top:12px">Original run, for reference: the run record in <code>resolved_tickets.json</code> also paid an $8.00 invoice for PO #1 on arrival, which ended at $152.00. That payment is not in the kept session.</p>
     </div>
   </section>
 
@@ -485,7 +483,7 @@ Specialist to specialist: none expected. Possible: accounting asks Boss for the 
       <p class="muted" style="margin:0 0 18px">Drafted from your notes during this session and checked against the audit trail, the database, and the ticket tabs. Edit anything that doesn't read as you.</p>
 
       <h3>1. The short version</h3>
-      <p>Ticket 102 resolved cleanly. Ticket 101 is waiting on stock: its payment and purchase order are approved, and the tee arrives 2026-09-05, when it can be fulfilled and resolved. Ticket 103 is blocked, and the team kept repeating the same blocker. Checking went from $3,400.00 to $152.00, and every dollar out was an approval I clicked. The team did the reasoning and the paperwork, and the money stayed in my hands. The biggest weakness was not reasoning. It was that the agents couldn't stop, and the board sometimes showed a status that was already out of date.</p>
+      <p>Ticket 102 resolved cleanly. Ticket 101 is waiting on stock: its payment and purchase order are approved, and the tee arrives 2026-09-05, when it can be fulfilled and resolved. Ticket 103 is blocked, and the team kept repeating the same blocker. Ticket 101's payments are resolved, but the ticket is pending inventory until the tee arrives. Checking went from $3,400.00 to $160.00 in the kept session, and every dollar out was an approval I clicked. The team did the reasoning and the paperwork, and the money stayed in my hands. The biggest weakness was not reasoning. It was that the agents couldn't stop, and the board sometimes showed a status that was already out of date.</p>
       <p class="muted" style="font-size:13px"><b>Evidence:</b> cash tab itemization and ending balance; the 101, 102, and 103 tabs (Actual sections).</p>
 
       <h3>2. How the agents performed on each ticket</h3>

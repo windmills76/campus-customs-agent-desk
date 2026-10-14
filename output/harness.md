@@ -340,7 +340,7 @@ These are enforced in code, not only in the prompts:
 - Reset to the original values. Starting checking balance: $3,400.00.
 - Fourteen team runs in the original run: ticket 101 three times, 102 twice, 103 nine times. Testing after Problem 11 added more runs, all in `output/audit_trail.json`. Events are in `output/audit_trail.json` (JSON lines, one event per line).
 - Seven requests: six approved (three payments, one purchase order, one discount, one answered question) and one declined (purchase order #7). Details are in `output/resolved_tickets.json`.
-- Ticket 101: payments resolved; pending inventory arriving to be fulfilled (not resolved). Ticket 102: resolved. Ticket 103: blocked.
+- Ticket 101: payments resolved; pending inventory arriving to be fulfilled (not resolved). Ticket 102: resolved. Ticket 103: pending inventory (not resolved).
 - Checking ends at $160.00 in the kept session (invoice 501 and rent paid). The original run ended at $152.00 after an $8.00 bill was paid on arrival.00. The cash itemization is on the cash tab of `output/desk_tickets.html`.
 - Known issue: a decision recorded after an approval executes during a run can overwrite the ticket's status. This happened on tickets 101 and 103 and is described in the reflection tab.
 
@@ -355,15 +355,15 @@ These are enforced in code, not only in the prompts:
 - **Incoming stock and customer confirmation.** Each ticket shows on hand, incoming units (approved purchase orders in transit, with ETAs), and missing units. A person records how many units the customer accepts (`POST /api/tickets/{id}/customer-confirmation`). Boss then asks Accounting to order only the missing units for that accepted quantity.
 - **Cash on orders.** A purchase order is refused if checking, minus pending payments and open bills, cannot cover its invoice. The same check runs at approval.
 
-## Ticket 103: why it is blocked
+## Ticket 103: status and reasoning
 
-Final outcome: **blocked**. Ticket 103 is a price override for 20 × CC-HOOD-NAVY (size M) for Yale AI Club.
+Current status: **pending inventory** (not resolved). Ticket 103 is a price override for 20 × CC-HOOD-NAVY (size M) for Yale AI Club.
 
 1. **Price.** The customer asked for a bulk discount but named no price. The team asked the desk (ask_human). The desk answered $28.00, which fails the 25% margin floor ($29.33). The desk then set $29.33, which passes the floor at 24.99%, and the discount was approved (approvals #5 and #6).
 2. **Stock.** 8 of 20 are on hand, so 12 are missing. No purchase order is incoming.
 3. **Restock.** The only matching vendor, Bulldog Print Co, was blocked by unpaid invoice 502 ($8.00) until the desk paid it (approval #6). After that, the vendor could ship.
 4. **Cash.** A 12-hoodie order is $264.00. Checking has $160.00 (after invoice 501 and rent). Purchase orders are now refused when committed cash cannot cover the invoice, so the order is refused.
-5. **What would unblock it.** Either the customer accepts a smaller quantity, which lets the team order only what checking covers, or more cash comes in. The ticket shows "Blocked" until one of these happens.
+5. **What would unblock it.** Either the customer accepts a smaller quantity, which lets the team order only what checking covers, or more cash comes in. The ticket shows "Pending inventory" while the purchase order is in transit, and may return to "Blocked" if the restock still cannot be paid when the stock arrives.
 
-The record of the original run is in `output/resolved_tickets.json` (ticket 103, final_status blocked).
+The run record in `output/resolved_tickets.json` shows the same status (ticket 103, final_status waiting_stock).
 

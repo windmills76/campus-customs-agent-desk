@@ -470,7 +470,7 @@ Specialist to specialist: none expected. Possible: accounting asks Boss for the 
         <tbody>
           <tr><td>101</td><td>Payments resolved; ticket pending inventory (not resolved). The tee arrives 2026-09-05, then it is fulfilled.</td><td>$160.00</td><td>−$840.00 (#1, invoice 501). The $8.00 for PO #2 is not paid yet.</td></tr>
           <tr><td>102</td><td>Resolved</td><td>$160.00</td><td>−$2,400.00 (#3, rent). Resolution itself moved no cash.</td></tr>
-          <tr><td>103</td><td>Blocked (not resolved)</td><td>$160.00</td><td>None. Nothing was paid for this ticket.</td></tr>
+          <tr><td>103</td><td>Pending inventory (not resolved)</td><td>$160.00</td><td>None. Nothing was paid for this ticket.</td></tr>
         </tbody>
       </table>
       <p class="muted" style="margin-top:12px">Original run, for reference: the run record in <code>resolved_tickets.json</code> also paid an $8.00 invoice for PO #1 on arrival, which ended at $152.00. That payment is not in the kept session.</p>
@@ -484,7 +484,7 @@ Specialist to specialist: none expected. Possible: accounting asks Boss for the 
       <p class="muted" style="margin:0 0 18px">Drafted from your notes during this session and checked against the audit trail, the database, and the ticket tabs. Edit anything that doesn't read as you.</p>
 
       <h3>1. The short version</h3>
-      <p>Ticket 102 resolved cleanly. Ticket 101 is waiting on stock: its payment and purchase order are approved, and the tee arrives 2026-09-05, when it can be fulfilled and resolved. Ticket 103 is blocked, and the team kept repeating the same blocker. Ticket 101's payments are resolved, but the ticket is pending inventory until the tee arrives. Checking went from $3,400.00 to $160.00 in the kept session, and every dollar out was an approval I clicked. The team did the reasoning and the paperwork, and the money stayed in my hands. The biggest weakness was not reasoning. It was that the agents couldn't stop, and the board sometimes showed a status that was already out of date.</p>
+      <p>Ticket 102 resolved cleanly. Ticket 101 is waiting on stock: its payment and purchase order are approved, and the tee arrives 2026-09-05, when it can be fulfilled and resolved. Ticket 103 is pending inventory: a $29.33 discount is approved, and the 12 missing hoodies wait on PO #1. During the run the team repeated the same blocker several times. Ticket 101's payments are resolved, but the ticket is pending inventory until the tee arrives. Checking went from $3,400.00 to $160.00 in the kept session, and every dollar out was an approval I clicked. The team did the reasoning and the paperwork, and the money stayed in my hands. The biggest weakness was not reasoning. It was that the agents couldn't stop, and the board sometimes showed a status that was already out of date.</p>
       <p class="muted" style="font-size:13px"><b>Evidence:</b> cash tab itemization and ending balance; the 101, 102, and 103 tabs (Actual sections).</p>
 
       <h3>2. How the agents performed on each ticket</h3>

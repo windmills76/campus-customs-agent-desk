@@ -177,10 +177,10 @@
     {
       "ticket_id": 103,
       "subject": "Bulk hoodie discount",
-      "final_status": "blocked",
-      "state": "blocked",
-      "short_outcome": "Blocked, not resolved. A discount at $29.33 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
-      "final_team_decision": "Blocked, not resolved. A discount at $29.34 was approved (approvals #5 and #6, the second a duplicate). 12 hoodies are still missing, and restocking them needs a $264.00 purchase order that checking ($160.00) cannot cover.",
+      "final_status": "waiting_stock",
+      "state": "waiting",
+      "short_outcome": "Pending inventory. Discount approved at $29.33 (approvals #5, #6 and #7; #5 and #6 are duplicates at $29.34 and are kept as history). The team reports 12 hoodies missing with no new order possible while PO #1 is in transit (ETA 2026-09-05). Once it arrives, a $264.00 restock would need cash the shop does not have, so the ticket may return to blocked.",
+      "final_team_decision": "Pending inventory. Discount approved at $29.33 (approvals #5, #6 and #7; #5 and #6 are duplicates at $29.34 and are kept as history). The team reports 12 hoodies missing with no new order possible while PO #1 is in transit (ETA 2026-09-05). Once it arrives, a $264.00 restock would need cash the shop does not have, so the ticket may return to blocked.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 29,

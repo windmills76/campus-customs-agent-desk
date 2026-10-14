@@ -338,7 +338,7 @@ These are enforced in code, not only in the prompts:
 ## Run record (Problem 9)
 
 - Reset to the original values. Starting checking balance: $3,400.00.
-- Fourteen team runs: ticket 101 three times, 102 twice, 103 nine times. Events are in `output/audit_trail.json` (JSON lines, one event per line).
+- Fourteen team runs in the original run: ticket 101 three times, 102 twice, 103 nine times. Testing after Problem 11 added more runs, all in `output/audit_trail.json`. Events are in `output/audit_trail.json` (JSON lines, one event per line).
 - Seven requests: six approved (three payments, one purchase order, one discount, one answered question) and one declined (purchase order #7). Details are in `output/resolved_tickets.json`.
 - Ticket 101: resolved. Ticket 102: resolved. Ticket 103: blocked.
 - Checking ends at $152.00. The cash itemization is on the cash tab of `output/desk_tickets.html`.

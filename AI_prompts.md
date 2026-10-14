@@ -293,3 +293,15 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **Not a correction.**
 
+### Follow-up 15: Confirmation
+
+> that works. let's finalize everything and push to the repo. where is the reflection you mentioned?
+
+**Not a correction.**
+
+### Follow-up 16: Full check
+
+> So if you adhered to every single prompt and instruction, I should get a 100. can you ensure that you did that and that the whole project works
+
+**Not a correction.**
+

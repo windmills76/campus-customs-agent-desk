@@ -158,6 +158,16 @@ export function App() {
     await refresh();
   };
 
+  const confirmCustomer = async (ticketId: number, acceptedQty: number) => {
+    try {
+      await api.customerConfirm(ticketId, acceptedQty);
+      notify(`Recorded: the customer accepts ${acceptedQty}. The team will order what is missing.`, "success");
+      await loadSelected(ticketId);
+    } catch (error) {
+      notify(message(error), "error");
+    }
+  };
+
   const addNote = async (ticketId: number, note: string) => {
     try {
       await api.addNote(ticketId, note);
@@ -243,6 +253,7 @@ export function App() {
           runningHere={runningId !== null && runningId === selectedId}
           onStart={startTeam}
           onNote={addNote}
+          onConfirm={confirmCustomer}
           startError={startError}
         />
         <ApprovalsPanel

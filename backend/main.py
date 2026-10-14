@@ -133,6 +133,18 @@ class NoteBody(BaseModel):
     note: str
 
 
+class CustomerConfirmBody(BaseModel):
+    accepted_qty: int
+
+
+@app.post("/api/tickets/{ticket_id}/customer-confirmation")
+async def customer_confirmation(ticket_id: int, body: CustomerConfirmBody) -> dict[str, Any]:
+    """A person records how many units the customer accepts. The team then orders what is missing for that quantity."""
+    result = _shop_call(shop.record_customer_confirmation, ticket_id, body.accepted_qty)
+    _team().request_run(ticket_id, f"customer confirmed {body.accepted_qty} unit(s)")
+    return result
+
+
 @app.get("/api/outbox")
 def outbox() -> list[dict[str, Any]]:
     """Pending customer drafts. Nothing in this outbox is ever sent by the app."""

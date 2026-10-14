@@ -352,4 +352,6 @@ These are enforced in code, not only in the prompts:
 - **Waiting on stock.** Tickets waiting for a shipment show as "Waiting on stock," not "Open," and are not resolved.
 - **Stale-decision fix.** If an approval is decided during a run, the ticket reopens and runs again. Tested live on ticket 101.
 - **Pending outbox.** Customer drafts appear under the approvals area. "Mark ready to send" and "Discard" record a decision only. Nothing is sent.
+- **Incoming stock and customer confirmation.** Each ticket shows on hand, incoming units (approved purchase orders in transit, with ETAs), and missing units. A person records how many units the customer accepts (`POST /api/tickets/{id}/customer-confirmation`). Boss then asks Accounting to order only the missing units for that accepted quantity.
+- **Cash on orders.** A purchase order is refused if checking, minus pending payments and open bills, cannot cover its invoice. The same check runs at approval.
 

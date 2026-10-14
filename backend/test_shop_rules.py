@@ -196,3 +196,23 @@ def test_resolves_once_the_order_is_fulfilled(shop_db):
         c.execute("UPDATE inventory SET qty = 1 WHERE sku = 'CC-TEE-WHITE' AND size = 'S'")
     shop_db.fulfill_order(101)
     assert shop_db.resolve_ticket(101, "resolved", "fulfilled from stock")["status"] == "resolved"
+
+
+def test_ticket_shows_incoming_and_missing_units(shop_db):
+    ticket = shop_db.get_ticket(103)
+    assert ticket["on_hand"] == 8 and ticket["incoming_units"] == 0 and ticket["missing_units"] == 12
+
+
+def test_order_refused_when_committed_cash_cannot_cover_it(shop_db):
+    with shop_db.connect() as c:
+        c.execute("UPDATE invoices SET status = 'paid' WHERE id = 501")  # so the vendor is not blocked
+        c.execute("UPDATE cash_accounts SET balance = 160")
+    with pytest.raises(shop.ShopError, match="Not enough committed cash"):
+        shop_db.request_purchase_order(1, "CC-HOOD-NAVY", "M", 12, ticket_id=103)
+    ok = shop_db.request_purchase_order(1, "CC-HOOD-NAVY", "M", 2, ticket_id=103)
+    assert ok["approval_id"]
+
+
+def test_customer_confirmation_is_recorded(shop_db):
+    shop_db.record_customer_confirmation(103, 20)
+    assert "CUSTOMER CONFIRMED: the customer accepts 20" in shop_db.get_ticket(103)["notes"]

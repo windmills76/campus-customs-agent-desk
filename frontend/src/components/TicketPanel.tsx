@@ -12,10 +12,11 @@ interface TicketPanelProps {
   runningHere: boolean;
   onStart: (id: number) => void;
   onNote: (id: number, note: string) => Promise<void>;
+  onConfirm: (id: number, acceptedQty: number) => Promise<void>;
   startError: string | null;
 }
 
-export function TicketPanel({ summary, detail, events, busy, runningHere, onStart, onNote, startError }: TicketPanelProps) {
+export function TicketPanel({ summary, detail, events, busy, runningHere, onStart, onNote, onConfirm, startError }: TicketPanelProps) {
   if (!summary) {
     return (
       <section className="column main-column" aria-label="Ticket">
@@ -84,6 +85,8 @@ export function TicketPanel({ summary, detail, events, busy, runningHere, onStar
         ))}
       </div>
 
+      {detail?.sku && <StockCard detail={detail} onConfirm={onConfirm} disabled={runningHere} />}
+
       <NoteBox ticketId={summary.id} onNote={onNote} disabled={runningHere} />
 
       <div className="two-up">
@@ -145,6 +148,62 @@ export function TicketPanel({ summary, detail, events, busy, runningHere, onStar
         </div>
       )}
     </section>
+  );
+}
+
+function StockCard({
+  detail,
+  onConfirm,
+  disabled,
+}: {
+  detail: TicketDetail;
+  onConfirm: (id: number, acceptedQty: number) => Promise<void>;
+  disabled: boolean;
+}) {
+  const requested = detail.qty ?? 0;
+  const [accepted, setAccepted] = useState(requested);
+  const [saving, setSaving] = useState(false);
+  const missing = detail.missing_units ?? 0;
+  return (
+    <div className="card stock-card">
+      <div className="section-head">
+        <h2>Stock for {detail.sku} {detail.size}</h2>
+        <span className="muted">Requested {requested}</span>
+      </div>
+      <div className="stock-grid">
+        <div><b>On hand</b><span>{detail.on_hand ?? 0}</span></div>
+        <div><b>Incoming</b><span>{detail.incoming_units ?? 0}</span></div>
+        <div className={missing > 0 ? "short" : ""}><b>Missing</b><span>{missing}</span></div>
+      </div>
+      {(detail.incoming ?? []).length > 0 && (
+        <p className="muted">
+          {(detail.incoming ?? []).map((p) => `PO #${p.id}: ${p.qty} unit(s), arriving ${p.eta}`).join(" · ")}
+        </p>
+      )}
+      <form
+        className="answer-form"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          setSaving(true);
+          await onConfirm(detail.id, accepted);
+          setSaving(false);
+        }}
+      >
+        <label className="muted" htmlFor="accepted">Customer accepts</label>
+        <input
+          id="accepted"
+          type="number"
+          min={1}
+          max={requested}
+          value={accepted}
+          onChange={(event) => setAccepted(Number(event.target.value))}
+          disabled={saving || disabled}
+        />
+        <button className="primary-button" type="submit" disabled={saving || disabled || accepted < 1 || accepted > requested}>
+          {saving ? "Saving…" : "Record customer confirmation"}
+        </button>
+      </form>
+    </div>
   );
 }
 

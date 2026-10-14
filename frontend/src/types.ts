@@ -60,6 +60,10 @@ export interface TicketDetail extends TicketSummary {
   approvals: Approval[];
   drafts: { id: number; recipient: string; body: string; status: string }[];
   purchase_orders: { id: number; sku: string; size: string; qty: number; eta: string; status: string }[];
+  on_hand?: number;
+  incoming?: { id: number; qty: number; eta: string }[];
+  incoming_units?: number;
+  missing_units?: number;
 }
 
 export interface CashBalance {

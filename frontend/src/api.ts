@@ -44,6 +44,8 @@ export const api = {
   outbox: () => request<OutboxDraft[]>("/api/outbox"),
   draftReady: (id: number) => request(`/api/outbox/${id}/ready`, { method: "POST" }),
   draftDiscard: (id: number) => request(`/api/outbox/${id}/discard`, { method: "POST" }),
+  customerConfirm: (ticketId: number, acceptedQty: number) =>
+    request(`/api/tickets/${ticketId}/customer-confirmation`, { method: "POST", body: JSON.stringify({ accepted_qty: acceptedQty }) }),
   addNote: (ticketId: number, note: string) =>
     request(`/api/tickets/${ticketId}/notes`, { method: "POST", body: JSON.stringify({ note }) }),
   cash: () => request<CashBalance>("/api/cash/balance"),

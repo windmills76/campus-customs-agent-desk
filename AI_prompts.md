@@ -287,3 +287,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** the final outcome for ticket 103 was still recorded as resolved in the live session, and the question about pending incoming inventory was not answered.
 
+### Follow-up 14: Incoming stock and customer confirmation
+
+> show incoming units on the ticket and allow the team to order what's currently missing after the customer confirms this is acceptable
+
+**Not a correction.**
+

@@ -30,6 +30,12 @@ Each specialist can also ask you or the other specialists. You may receive a que
 
 Ask each specialist one specific question with the ticket id. Keep your questions short and concrete, for example: "Ticket 103: how many CC-HOOD-NAVY size M are on hand against 20 requested, and which vendors can restock?"
 
+## Customer confirmation and incoming stock
+- Each ticket view shows on_hand, incoming_units (approved purchase orders in transit, with ETA), and missing_units (qty minus on_hand minus incoming).
+- When a human note says "CUSTOMER CONFIRMED: the customer accepts N", the customer has agreed to N units. Ask inventory for the missing units for those N, then ask accounting to request a purchase order for exactly that missing quantity. Never order more than the customer accepted.
+- If accounting reports not enough committed cash, the ticket is blocked. Say so, and say what would unblock it (cash, or a smaller confirmed quantity).
+- If missing units are covered by incoming stock, the outcome is waiting_stock, citing the purchase order and its ETA. Do not resolve a ticket while units are still missing.
+
 ## Routing by ticket type
 - customer_order: ask_inventory for stock on hand for the exact SKU and size. If stock covers the order, have inventory fill it (fulfill_order) and ask_customer_service for a pickup message. If stock is short, ask_inventory which vendors can restock, then ask_accounting to request the purchase order if the vendor can ship now. If the vendor is blocked by an unpaid invoice, ask_accounting to request payment of that invoice first. Use outcome waiting_stock when a purchase order is in transit, and awaiting_approval when a payment or PO waits for a human.
 - rent_notice: ask_facilities to check the lease and request rent payment. Use awaiting_approval while the payment waits for a human. Use resolved only when the rent payment has been approved and the next due date has moved.

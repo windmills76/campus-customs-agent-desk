@@ -362,6 +362,18 @@ def get_ticket(ticket_id: int) -> dict[str, Any]:
         if ticket["sku"]:
             ticket["pricing"] = _one(c, "SELECT * FROM pricing WHERE sku = ?", (ticket["sku"],))
             ticket["stock"] = _rows(c.execute("SELECT * FROM inventory WHERE sku = ? ORDER BY size", (ticket["sku"],)))
+        if ticket["sku"] and ticket["size"]:
+            on_hand = _one(c, "SELECT qty FROM inventory WHERE sku = ? AND size = ?", (ticket["sku"], ticket["size"]))
+            incoming = _rows(
+                c.execute(
+                    "SELECT id, qty, eta FROM purchase_orders WHERE sku = ? AND size = ? AND status = 'in_transit' ORDER BY id",
+                    (ticket["sku"], ticket["size"]),
+                )
+            )
+            ticket["on_hand"] = on_hand["qty"] if on_hand else 0
+            ticket["incoming"] = incoming
+            ticket["incoming_units"] = sum(p["qty"] for p in incoming)
+            ticket["missing_units"] = max(0, int(ticket["qty"] or 0) - ticket["on_hand"] - ticket["incoming_units"])
         ticket["drafts"] = _rows(c.execute("SELECT * FROM drafts WHERE ticket_id = ? ORDER BY id", (ticket_id,)))
         ticket["approvals"] = _rows(c.execute("SELECT * FROM approvals WHERE ticket_id = ? ORDER BY id", (ticket_id,)))
         ticket["purchase_orders"] = _rows(
@@ -676,6 +688,12 @@ def create_draft(
         return {"ok": True, "draft_id": cur.lastrowid, "status": "draft"}
 
 
+def _committed_cash(c: sqlite3.Connection) -> float:
+    """Cash left after payments awaiting approval and every open vendor bill."""
+    open_bills = c.execute("SELECT COALESCE(SUM(amount), 0) AS total FROM invoices WHERE status != 'paid'").fetchone()["total"]
+    return _cash_balance(c) - _pending_payment_total(c) - float(open_bills)
+
+
 def request_purchase_order(
     vendor_id: int,
     sku: str,
@@ -698,6 +716,12 @@ def request_purchase_order(
         if block:
             raise ShopError(f"{vendor['name']} cannot ship yet: {block}")
         amount = qty * float(price["unit_cost"])
+        committed = _committed_cash(c)
+        if amount > committed:
+            raise ShopError(
+                f"Not enough committed cash for this order: its invoice would be ${amount:.2f}, "
+                f"and checking has ${committed:.2f} after pending payments and open bills"
+            )
         eta = today + timedelta(days=vendor["lead_days"])
         summary = (
             f"Order {qty} x {sku} ({size}) from {vendor['name']} at ${price['unit_cost']:.2f}, "
@@ -876,6 +900,9 @@ def _place_purchase_order(
     block = _vendor_block(c, vendor["id"])
     if block:
         raise ShopError(f"{vendor['name']} cannot ship yet: {block}")
+    amount = payload["qty"] * float(payload["unit_cost"])
+    if amount > _committed_cash(c):
+        raise ShopError(f"Not enough committed cash to place this order (${amount:.2f}). Payment refused.")
     eta = today + timedelta(days=vendor["lead_days"])
     cur = c.execute(
         "INSERT INTO purchase_orders (vendor_id, sku, size, qty, unit_cost, ticket_id, approval_id, ordered_on, eta, status) "
@@ -1077,6 +1104,21 @@ def reject_approval(approval_id: int, reason: str = "", decided_by: str = "human
             c.execute("UPDATE tickets SET status = 'open' WHERE id = ? AND status = 'awaiting_approval'", (ticket_id,))
         _log(c, decided_by, ticket_id, "approval", f"rejected #{approval_id}: {reason}")
         return {"ok": True, "approval_id": approval_id, "status": "rejected"}
+
+
+def record_customer_confirmation(ticket_id: int, accepted_qty: int) -> dict[str, Any]:
+    """A person records that the customer accepts this quantity. The team may then order what is missing for it."""
+    with connect() as c:
+        today = _today(c)
+        ticket = _ticket_or_raise(c, ticket_id)
+        if not ticket["sku"] or not ticket["qty"]:
+            raise ShopError("Only tickets for a specific item and quantity can be confirmed")
+        if not 1 <= int(accepted_qty) <= int(ticket["qty"]):
+            raise ShopError(f"accepted quantity must be between 1 and {ticket['qty']}")
+        text = f"CUSTOMER CONFIRMED: the customer accepts {int(accepted_qty)} x {ticket['sku']} ({ticket['size']}). Order what is missing for that quantity."
+        _note(c, ticket_id, f"human: {text}", today)
+        _log(c, "human", ticket_id, "customer_confirmation", text)
+        return {"ok": True, "ticket_id": ticket_id, "accepted_qty": int(accepted_qty)}
 
 
 def add_human_note(ticket_id: int, note: str) -> dict[str, Any]:

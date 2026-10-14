@@ -121,3 +121,10 @@ def test_outbox_lists_drafts_and_nothing_is_sent(client):
     assert response.status_code == 200 and response.json()["sent"] is False
     assert client.get("/api/outbox").json() == []
     assert client.post(f"/api/outbox/{draft['draft_id']}/discard").status_code == 400  # already decided
+
+
+def test_customer_confirmation_is_recorded_and_starts_a_run(client):
+    response = client.post("/api/tickets/103/customer-confirmation", json={"accepted_qty": 20})
+    assert response.status_code == 200
+    assert "CUSTOMER CONFIRMED: the customer accepts 20" in client.get("/api/tickets/103").json()["notes"]
+    assert client.post("/api/tickets/103/customer-confirmation", json={"accepted_qty": 99}).status_code == 400

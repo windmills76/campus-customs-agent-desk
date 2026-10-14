@@ -344,3 +344,12 @@ These are enforced in code, not only in the prompts:
 - Checking ends at $152.00. The cash itemization is on the cash tab of `output/desk_tickets.html`.
 - Known issue: a decision recorded after an approval executes during a run can overwrite the ticket's status. This happened on tickets 101 and 103 and is described in the reflection tab.
 
+## Latest changes (testing, after Problem 11)
+
+- **Run reasons.** Every run records why it started: a decision, a human start, a queue entry, or a reopen. The dashboard shows the running ticket and the queue.
+- **Restart recovery.** A ticket left `in_progress` by a server restart is reopened at startup, with a note. It is not run again automatically.
+- **Resolution guard.** A ticket cannot be resolved while stock for it is still short. The team records the refusal as blocked, with the reason.
+- **Waiting on stock.** Tickets waiting for a shipment show as "Waiting on stock," not "Open," and are not resolved.
+- **Stale-decision fix.** If an approval is decided during a run, the ticket reopens and runs again. Tested live on ticket 101.
+- **Pending outbox.** Customer drafts appear under the approvals area. "Mark ready to send" and "Discard" record a decision only. Nothing is sent.
+

@@ -269,3 +269,15 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** a ticket could be resolved while stock was still short, and a ticket waiting on stock looked the same as open work.
 
+### Follow-up 11: Cash total
+
+> the total was previously 152 at the end of all approvals -- why is is 160 now
+
+**What was lacking:** the cash total depended on whether the $8.00 invoice had been created, and that depended on the desk date, which had not been moved in this session.
+
+### Follow-up 12: Push everything
+
+> okay then we keep it. can you push all of the changes and updates to the repo and ensure that I absolutely ace this assignment?
+
+**Not a correction.**
+

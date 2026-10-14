@@ -317,3 +317,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **Not a correction.**
 
+### Follow-up 19: Everything to the latest approved description
+
+> Please update everything to the most recent approved description. i've said this multiple times. 101 should be waiting for inventory and not resolved. update the checking summary to 160 because we already fixed that. the cash tab resolution can say resolved since the payments were resolved, but the ticket itself is pending inventory. resolved tickets should say 101 payment is resolved but pending inventory arriving to be fulfilled.
+
+**What was lacking:** the reflection, cash tab, board captions, and run record still described the original run (101 resolved, checking $152.00) rather than the kept session, and the approved $29.34 discount price had not been checked against the earlier $29.33.
+

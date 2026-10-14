@@ -16,18 +16,19 @@
   figcaption b { color: #0b2a5b; font-size: 17px; }
   .resolved { color: #137a3a; font-weight: 700; }
   .blocked { color: #d70015; font-weight: 700; }
+  .waiting { color: #b45309; font-weight: 700; }
 </style>
 </head>
 <body>
 <header>
   <h1>Campus Customs: the board after the full run</h1>
-  <p>Screenshots of the React desk, one per ticket, each taken with that ticket selected. Checking is <b>$152.00</b> at the end of the run, matching <code>cash_accounts</code>. Tickets 101 and 102 are resolved. Ticket 103 is blocked, not resolved: the restock cannot be paid with the checking balance on hand.</p>
+  <p>Screenshots of the React desk taken with each ticket selected, on the session kept after the run. Checking is <b>$160.00</b> in the working database (invoice 501 and rent are paid; the $8.00 invoice for PO #1 is not yet due because the tee has not arrived). Ticket 101 is waiting on stock, ticket 102 is resolved, and ticket 103 is blocked.</p>
 </header>
 <main>
   <figure>
-    <img src="ticket_101.png" alt="Campus Customs desk with ticket 101 selected, showing it resolved">
-    <figcaption><b>Ticket 101: Bulldog tee for Tauhid Zaman. <span class="resolved">Resolved.</span></b><br>
-      Invoice 501 ($840) paid, PO #1 for one tee ($8.00) received 2026-09-05, fulfilled from stock, pickup draft #2 saved and not sent. Approvals #1 and #4.</figcaption>
+    <img src="ticket_101.png" alt="Campus Customs desk with ticket 101 selected, waiting on stock">
+    <figcaption><b>Ticket 101: Bulldog tee for Tauhid Zaman. <span class="waiting">Waiting on stock.</span></b><br>
+      Invoice 501 ($840) paid, PO #1 (one tee, $8.00) in transit with ETA 2026-09-05. The tee has not arrived, so it is not fulfilled and the ticket is not resolved. It resumes automatically on arrival.</figcaption>
   </figure>
   <figure>
     <img src="ticket_102.png" alt="Campus Customs desk with ticket 102 selected, showing it resolved">
@@ -37,7 +38,7 @@
   <figure>
     <img src="ticket_103.png" alt="Campus Customs desk with ticket 103 selected, showing it blocked">
     <figcaption><b>Ticket 103: Bulk hoodie discount for Yale AI Club. <span class="blocked">Blocked.</span></b><br>
-      Discount approved at $29.33 (approval #5). Invoice 502 ($8.00) paid under approval #6. The 12-hoodie restock ($264.00, approval #7) was declined, and checking ($152.00) cannot cover that invoice.</figcaption>
+      Discount approved at $29.33 (approvals #5 and #6). 12 hoodies are missing, and the $264.00 restock cannot be paid with $160.00 in checking. Reasoning is in the harness, section "Ticket 103: why it is blocked."</figcaption>
   </figure>
 </main>
 </body>

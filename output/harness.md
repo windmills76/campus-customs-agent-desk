@@ -355,3 +355,15 @@ These are enforced in code, not only in the prompts:
 - **Incoming stock and customer confirmation.** Each ticket shows on hand, incoming units (approved purchase orders in transit, with ETAs), and missing units. A person records how many units the customer accepts (`POST /api/tickets/{id}/customer-confirmation`). Boss then asks Accounting to order only the missing units for that accepted quantity.
 - **Cash on orders.** A purchase order is refused if checking, minus pending payments and open bills, cannot cover its invoice. The same check runs at approval.
 
+## Ticket 103: why it is blocked
+
+Final outcome: **blocked**. Ticket 103 is a price override for 20 × CC-HOOD-NAVY (size M) for Yale AI Club.
+
+1. **Price.** The customer asked for a bulk discount but named no price. The team asked the desk (ask_human). The desk answered $28.00, which fails the 25% margin floor ($29.33). The desk then set $29.33, which passes the floor at 24.99%, and the discount was approved (approvals #5 and #6).
+2. **Stock.** 8 of 20 are on hand, so 12 are missing. No purchase order is incoming.
+3. **Restock.** The only matching vendor, Bulldog Print Co, was blocked by unpaid invoice 502 ($8.00) until the desk paid it (approval #6). After that, the vendor could ship.
+4. **Cash.** A 12-hoodie order is $264.00. Checking has $160.00 (after invoice 501 and rent). Purchase orders are now refused when committed cash cannot cover the invoice, so the order is refused.
+5. **What would unblock it.** Either the customer accepts a smaller quantity, which lets the team order only what checking covers, or more cash comes in. The ticket shows "Blocked" until one of these happens.
+
+The record of the original run is in `output/resolved_tickets.json` (ticket 103, final_status blocked).
+

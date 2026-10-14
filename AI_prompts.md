@@ -305,3 +305,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **Not a correction.**
 
+### Follow-up 17: Finalize for submission
+
+> 1. ticket 103 can stay as blocked if you provide the reasoning for it somewhere. 2. This sounds fine -- the instructions say this can be generated via vibe and I have stated all of that to some degree through my prompts and responses. Ensure that we have each point connecting to a specific campus customs area -- double check this is the case. 3. update the board screenshots. 4. I approved both of these assumptions and confirmed them with my responses. 5. I will check the dashboard once you make these changes and push everything to the repo
+
+**What was lacking:** the reflection had no pointers to the specific ticket tabs, cash rows, or tables behind each point, several "what I would fix" items were out of date, and the board screenshots and captions did not match the kept session.
+

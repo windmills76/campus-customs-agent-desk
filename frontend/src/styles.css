@@ -406,3 +406,4 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .stock-grid .short span { color: var(--red); }
 .stock-card label { white-space: nowrap; }
 .stock-card input[type="number"] { width: 90px; flex: none; }
+.resolution-banner.waiting { background: #fff8ea; color: #7a4a00; border-color: rgba(180, 83, 9, 0.25); }

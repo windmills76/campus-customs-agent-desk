@@ -486,23 +486,29 @@ Specialist to specialist: none expected. Possible: accounting asks Boss for the 
 
       <h3>1. The short version</h3>
       <p>Ticket 102 resolved cleanly. Ticket 101 resolved after a full cycle: a payment, a purchase order, a shipment, and a fulfilment. Ticket 103 is blocked, and the team kept repeating the same blocker. Checking went from $3,400.00 to $152.00, and every dollar out was an approval I clicked. The team did the reasoning and the paperwork, and the money stayed in my hands. The biggest weakness was not reasoning. It was that the agents couldn't stop, and the board sometimes showed a status that was already out of date.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> cash tab itemization and ending balance; the 101, 102, and 103 tabs (Actual sections).</p>
 
       <h3>2. How the agents performed on each ticket</h3>
 
       <h4>Ticket 101: good reasoning, one real bug</h4>
       <p>The chain was right at every step. Stock was 0, the overdue invoice 501 blocked the only vendor, the team asked for payment, and once I paid, it asked for a purchase order with an ETA of 2026-09-05. After the shipment arrived, it fulfilled the order and drafted a pickup message, and then it resolved the ticket. See the Actual section on the 101 tab for the timeline.</p>
       <p>What I think went wrong is a bug, not reasoning. I approved PO #4 at 13:17:58. The run's final decision was recorded at 13:18:01 and still said "awaiting approval," so the ticket sat in the wrong state after its order was already placed. The cause is that approvals execute during a run, and the final decision overwrites the ticket status without reading it again. The same thing happened on 103 with approval #6 (approved 13:29:32, decision recorded 13:29:42 as awaiting approval). Both times the board was wrong for about a minute, and the next run had to fix it.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 101 tab, Actual run 2 (approval #4 and the 13:18:01 decision); 103 tab, Actual run G (approval #6 and the 13:29:42 decision).</p>
       <p>Two smaller points. Inventory asked Accounting for the purchase order directly, instead of going through Boss. That was allowed by the tools, but it wasn't in the plan. And because the approval landed mid-run, the team never recorded the "waiting on stock" state I expected, so the run went straight from ordering to fulfilling.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 101 tab, Actual runs 2 and 3.</p>
 
       <h4>Ticket 102: the cleanest run</h4>
       <p>This ticket matched the plan. Boss sent it to facilities. Facilities asked accounting to confirm cash covered the rent (you asked for that change, and it worked: accounting confirmed it in the run at 13:15). Facilities requested one payment, approval #2, and once I approved it, the lease moved to 2026-10-02 and Boss resolved the ticket at 13:17:36. There was one payment, one approval, and a rule that doesn't change: the due date. That is the kind of work an agent should handle without a lot of judgment, and it did.</p>
       <p>I'd still note that the approval queue, not Boss, was the human step. Boss never needed to ask me a question here. That's correct, but it means the ask-human tool wasn't tested on this ticket.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 102 tab, Actual runs 1 and 2; the approval queue on the board.</p>
 
       <h4>Ticket 103: the team ran nine times and didn't converge</h4>
       <p>This is where the agents did badly, and I think the reason is structural, not a matter of model quality. The team reported the right facts every time: 8 on hand, a 12-unit shortfall, Bulldog blocked by invoice 502, and $28 below the $29.33 floor. But nothing made a run stop when nothing had changed. So runs C, E, and F repeated the same checks, and accounting called get_cash eight times across the ticket. Customer service wrote three drafts to the same customer (drafts #1, #3, and #4), and the board doesn't say which one is current.</p>
       <p>Run H is the one I'd call a real mistake. Accounting requested a purchase order for 12 hoodies for $264.00, with $152.00 in checking. The request tool checks cash for payments, but not for the invoice that the order will create. The team knew the amount, and still asked. I declined it, and that was right, but the system should have refused the request itself.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 103 tab, Actual run H (approval #7, $264.00); cash tab, 'Requests that did not move cash'.</p>
       <p>I also have to own my part. Your $28.00 answer was below the floor, and I should have said so before you answered. Later I approved discount #5 at $29.33, which is a 24.99% margin. The check accepts that because it rounds the floor to $29.33. I fixed the wording afterward, but I approved the price without making sure the margin was actually at the 25% line.</p>
       <p>Finally, Boss didn't request invoice 502's payment until I added a note telling it to. The prompt describes the vendor block, but no rule tells Boss that paying the blocking invoice is its job. So it waited for a person. That's defensible, but it's a gap in the instructions.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 103 tab, Actual run G: Boss waited for the human note on invoice 502.</p>
 
       <h3>3. Expected versus actual</h3>
       <table>
@@ -517,28 +523,35 @@ Specialist to specialist: none expected. Possible: accounting asks Boss for the 
       <h3>4. Could one agent with tools do this more simply?</h3>
       <p>Yes, for this workload. Each ticket here is a short sequence: check stock, check the vendor, request money or an order, wait for a person. None of the steps needed two minds. A single agent with the same tools and the same approval gates would have been simpler, cheaper, and probably faster, because it wouldn't have needed the handoffs that created most of the repeated runs on 103.</p>
       <p>The split still earned something, but less than it looks. The main gain is authority: only accounting can request money, only customer service can draft, and inventory can't touch cash. Those limits are enforced by tool lists, and a single agent could have the same limits by tool access. The second gain is an audit trail with a name on each step, which is useful for this exercise. The cost was the delegation overhead: 103 made 17 delegations across nine runs (15 from Boss, 2 from Inventory to Accounting). If I rebuilt this, I'd keep a separate accounting role, because it's the only one that touches money, and fold inventory and facilities into one operations agent. Customer service would stay separate because its output goes outside the shop.</p>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 103 tab, delegation map and Actual rows; agent cards on the board.</p>
 
       <h3>5. Three new problems this agent team can solve with the tools we built</h3>
       <ol>
         <li><b>Monthly rent that requests itself.</b> Lease 1 moved from 2026-09-02 to 2026-10-02 when approval #2 executed. The tools already cover this: list the leases, see the next due date, and request the payment. What's missing is a trigger. Nothing today runs on a date, so someone has to start the team. A scheduler that checks due dates each morning would turn ticket 102 into a monthly routine.</li>
-        <li><b>Customer orders that wait for stock.</b> Ticket 101 already does this end to end: check stock, request an order with an ETA, wait for the shipment, fulfill, and draft a message. The gap is that the customer message didn't include the ETA, and it should. Ticket 101's draft is a pickup message, because the ETA rule isn't in the customer service prompt yet.</li>
-        <li><b>Discounts that respect the margin floor.</b> On ticket 103 the team checked $28.00 and refused it: 21.43%, below the $29.33 floor. That refusal protected the shop, and the tools did it. The gap is the 25.00% rounding I described above. The fix is to compare margins at full precision, and to show the number on the request.</li>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 102 tab, cash tab row for 13:16:52, and the lease's next due date (2026-10-02).</p>
+        <li><b>Customer orders that wait for stock.</b> Ticket 101 already does this end to end: check stock, request an order with an ETA, wait for the shipment, fulfill, and draft a message. The gap was that the first draft was not written before the shipment arrived, so it carried no ETA. The customer service prompt now requires the ETA when a draft is written for an order that is not ready. Draft #2 on ticket 101 is a pickup message written after fulfilment.</li>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 101 tab, Actual run 3 step 2 (draft #2).</p>
+        <li><b>Discounts that respect the margin floor.</b> On ticket 103 the team checked $28.00 and refused it: 21.43%, below the $29.33 floor. That refusal protected the shop, and the tools did it. The gap is the 25.00% rounding I described above. Status: partly fixed. The request now shows the margin to two decimals (24.99%), but the floor price is still a rounded $29.33, so $29.33 is accepted at a margin just under 25%.</li>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 103 tab, Actual run B (margin check at $28.00) and run D (discount approval #5).</p>
       </ol>
 
       <h3>6. Three problems this agent team cannot solve with the tools we built</h3>
       <ol>
         <li><b>Money coming in.</b> The homework has no revenue, so the cash tab can only go down. The team can't record a sale, a customer payment, a refund, or the money from ticket 101's pickup. It can't tell whether the $840 Bulldog bill was paid from sales or from the rent reserve. To solve this we'd need an orders table with sale lines, a receipts account, payments received against orders, refunds, and a reconciliation between sales and cash.</li>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> cash tab: every row is a payment out; there are no receipt rows.</p>
         <li><b>Partial fulfilment.</b> Ticket 103 asks for 20 hoodies, and 8 are on hand. The team can't fill 8 now and order 12 later, because <code>fulfill_order</code> only works on customer orders, and a price override has no fulfilment path. To solve this we'd need order lines, stock reservations, partial shipments, and a fulfilment tool for price overrides.</li>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 103 tab, stock card (8 on hand, 12 missing). Update: a customer's accepted quantity now lets the team order the missing units, but the 8 on hand still cannot ship.</p>
         <li><b>Cash planning.</b> Ticket 103's $264 purchase order was requested with $152 in checking, and the tools only check the money that's due now. The team has no forward view: no schedule of bills and due dates, no cash forecast, and no rule for which bill comes first. To solve this we'd need a payables schedule with due dates, a cash forecast that includes expected receipts, a rule that a purchase order must be covered by committed cash, and a priority order for payments when cash is short.</li>
+      <p class="muted" style="font-size:13px"><b>Evidence:</b> 103 tab, Actual run H (approval #7 for $264.00 against $152.00). Update: purchase orders are now refused when committed cash cannot cover them.</p>
       </ol>
 
       <h3>7. What I would fix first</h3>
       <ol>
-        <li><b>The stale status.</b> The final decision should re-read the ticket before it records a state, so an approval that landed mid-run can't be overwritten. This is the one real bug in the run.</li>
-        <li><b>A stop rule.</b> If a run finds the same blocker with the same facts as the last run, it should stop and say so, instead of repeating the checks and writing another draft.</li>
-        <li><b>Cash coverage on purchase orders.</b> A purchase order should be refused if the invoice it will create can't be covered by committed cash.</li>
-        <li><b>One draft per ticket.</b> A new draft should replace the old one, not add to it.</li>
-        <li><b>Boss owns blocking payments.</b> A rule that when a vendor is blocked by an unpaid invoice, Boss requests that payment, instead of waiting for a person to ask.</li>
+        <li><b>The stale status.</b> The final decision should re-read the ticket before it records a state, so an approval that landed mid-run can't be overwritten. This is the one real bug in the run. <b>Status: fixed.</b> An approval decided during a run reopens the ticket and runs it again. Tested live on ticket 101.</li>
+        <li><b>A stop rule.</b> If a run finds the same blocker with the same facts as the last run, it should stop and say so, instead of repeating the checks and writing another draft. <b>Status: not yet built.</b></li>
+        <li><b>Cash coverage on purchase orders.</b> A purchase order should be refused if the invoice it will create can't be covered by committed cash. <b>Status: fixed.</b> Checked at request and at approval.</li>
+        <li><b>One draft per ticket.</b> A new draft should replace the old one, not add to it. <b>Status: not yet built.</b></li>
+        <li><b>Boss owns blocking payments.</b> A rule that when a vendor is blocked by an unpaid invoice, Boss requests that payment, instead of waiting for a person to ask. <b>Status: not yet built.</b></li>
       </ol>
     </div>
   </section>

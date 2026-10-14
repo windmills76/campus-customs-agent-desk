@@ -586,7 +586,12 @@ def resolve_ticket(ticket_id: int, outcome: str, summary: str, agent: str = "bos
         raise ShopError(f"outcome must be one of {', '.join(OUTCOMES)}")
     with connect() as c:
         today = _today(c)
-        _ticket_or_raise(c, ticket_id)
+        ticket = _ticket_or_raise(c, ticket_id)
+        if outcome == "resolved" and ticket["sku"] and ticket["qty"] and not ticket["fulfilled_at"]:
+            on_hand = _one(c, "SELECT qty FROM inventory WHERE sku = ? AND size = ?", (ticket["sku"], ticket["size"]))
+            short = int(ticket["qty"]) - int(on_hand["qty"] if on_hand else 0)
+            if short > 0:
+                raise ShopError(f"cannot resolve: {short} unit(s) still short for {ticket['sku']} {ticket['size']}; use waiting_stock or blocked")
         c.execute(
             "UPDATE tickets SET status = ?, resolution = ? WHERE id = ?",
             (outcome, summary, ticket_id),

@@ -85,7 +85,7 @@ class TicketSummary(BaseModel):
     requester: str
     subject: str
     status: str
-    state: Literal["open", "blocked", "resolved"]
+    state: Literal["open", "waiting", "blocked", "resolved"]
     overdue: bool
     pending_approvals: int
 

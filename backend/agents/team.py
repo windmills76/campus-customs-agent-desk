@@ -118,7 +118,10 @@ class AgentTeam:
                     self.queue.append(ticket_id)
                     shop.log_event("system", ticket_id, "run", f"queued again: {reason}")
                 else:
-                    shop.resolve_ticket(ticket_id, decision.outcome, decision.summary, agent="boss")
+                    try:
+                        shop.resolve_ticket(ticket_id, decision.outcome, decision.summary, agent="boss")
+                    except shop.ShopError as refusal:
+                        shop.resolve_ticket(ticket_id, "blocked", f"Boss chose {decision.outcome}, but the ticket cannot close: {refusal}", agent="system")
             except Exception as exc:  # keep the board honest if a model call or the database fails
                 shop.log_event("system", ticket_id, "error", repr(exc)[:500])
                 shop.resolve_ticket(ticket_id, "blocked", f"Run failed: {exc!r}"[:500], agent="system")

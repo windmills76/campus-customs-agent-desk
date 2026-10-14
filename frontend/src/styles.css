@@ -189,6 +189,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .state-pill.open { background: #e6f0ff; color: #0a4fbf; }
 .state-pill.resolved { background: var(--green-wash); color: #137a3a; }
 .state-pill.blocked { background: #ffe9e6; color: var(--red); }
+.state-pill.waiting { background: #fff4e0; color: var(--amber); }
 .overdue { font-size: 11.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; background: #ffe9e6; color: var(--red); }
 .approval-count { font-size: 11.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; background: var(--amber-wash); color: var(--amber); }
 

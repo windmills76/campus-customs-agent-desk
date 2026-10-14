@@ -263,3 +263,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** runs could start or stay queued without a visible reason, and a server restart could leave a ticket stuck in progress.
 
+### Follow-up 10: Resolved versus waiting
+
+> How did ticket 3 get resolved if it's pending 12 sweatshirts arriving? and shouldn't 1 be resolved but waiting for inventory to come in?
+
+**What was lacking:** a ticket could be resolved while stock was still short, and a ticket waiting on stock looked the same as open work.
+

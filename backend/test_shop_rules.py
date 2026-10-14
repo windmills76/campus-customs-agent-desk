@@ -182,3 +182,17 @@ def test_interrupted_run_is_reopened_not_rerun(shop_db):
     ticket = shop_db.get_ticket(101)
     assert ticket["status"] == "open" and "run was interrupted" in ticket["notes"]
     assert shop_db.recover_interrupted_runs() == []
+
+
+def test_cannot_resolve_while_stock_is_short(shop_db):
+    with pytest.raises(shop.ShopError, match="still short"):
+        shop_db.resolve_ticket(103, "resolved", "discount approved, hoodies to come")
+    shop_db.resolve_ticket(103, "waiting_stock", "12 hoodies still to restock")
+    assert shop_db.get_ticket(103)["status"] == "waiting_stock"
+
+
+def test_resolves_once_the_order_is_fulfilled(shop_db):
+    with shop_db.connect() as c:
+        c.execute("UPDATE inventory SET qty = 1 WHERE sku = 'CC-TEE-WHITE' AND size = 'S'")
+    shop_db.fulfill_order(101)
+    assert shop_db.resolve_ticket(101, "resolved", "fulfilled from stock")["status"] == "resolved"

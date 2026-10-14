@@ -11,7 +11,8 @@ const STATUS_LABELS: Record<string, string> = {
   blocked: "Blocked",
 };
 
-export const stateLabel = (state: string) => (state === "resolved" ? "Resolved" : state === "blocked" ? "Blocked" : "Open");
+export const stateLabel = (state: string) =>
+  state === "resolved" ? "Resolved" : state === "blocked" ? "Blocked" : state === "waiting" ? "Waiting on stock" : "Open";
 
 export const statusLabel = (status: string) => STATUS_LABELS[status] ?? status.replace(/_/g, " ");
 

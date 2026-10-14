@@ -1,6 +1,6 @@
 // Shapes returned by the FastAPI routes in backend/main.py.
 
-export type TicketState = "open" | "blocked" | "resolved";
+export type TicketState = "open" | "waiting" | "blocked" | "resolved";
 
 export interface TicketSummary {
   id: number;

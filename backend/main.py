@@ -90,6 +90,7 @@ def _summary(ticket: dict[str, Any]) -> TicketSummary:
         state=(
             "resolved" if ticket["status"] == "resolved"
             else "blocked" if ticket["status"] == "blocked"
+            else "waiting" if ticket["status"] == "waiting_stock"
             else "open"
         ),
         overdue=ticket["overdue"],

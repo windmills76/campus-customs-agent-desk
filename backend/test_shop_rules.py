@@ -175,3 +175,10 @@ def test_reopen_ticket_sets_open_with_a_note(shop_db):
     ticket = shop_db.get_ticket(101)
     assert ticket["status"] == "open" and "reopened: test reason" in ticket["notes"]
 
+
+def test_interrupted_run_is_reopened_not_rerun(shop_db):
+    shop_db.set_ticket_status(101, "in_progress", agent="boss")
+    assert shop_db.recover_interrupted_runs() == [101]
+    ticket = shop_db.get_ticket(101)
+    assert ticket["status"] == "open" and "run was interrupted" in ticket["notes"]
+    assert shop_db.recover_interrupted_runs() == []

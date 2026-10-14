@@ -18,6 +18,7 @@ const message = (error: unknown) => (error instanceof ApiError || error instance
 export function App() {
   const [online, setOnline] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [queue, setQueue] = useState<number[]>([]);
   const [tickets, setTickets] = useState<TicketSummary[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [outbox, setOutbox] = useState<OutboxDraft[]>([]);
@@ -73,6 +74,7 @@ export function App() {
       setOutbox(drafts);
       setOnline(true);
       setBusy(health.busy);
+      setQueue(health.queue);
       busyRef.current = health.busy;
       setTickets(board);
       setApprovals(pending);
@@ -216,7 +218,10 @@ export function App() {
   };
 
   const summary = tickets.find((ticket) => ticket.id === selectedId);
-  const runningLabel = runningId !== null ? `Working on #${runningId}` : null;
+  const runningLabel = [
+    runningId !== null ? `Working on #${runningId}` : null,
+    queue.length > 0 ? `next: #${queue.join(", #")}` : null,
+  ].filter(Boolean).join(" · ") || null;
 
   return (
     <div className="app">

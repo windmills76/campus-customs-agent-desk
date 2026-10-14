@@ -45,6 +45,7 @@ class DeskDateBody(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    shop.recover_interrupted_runs()  # a run cut off by a restart must not leave its ticket stuck in progress
     team = AgentTeam()
     await team.start()
     app.state.team = team
@@ -101,7 +102,15 @@ def _summary(ticket: dict[str, Any]) -> TicketSummary:
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    return {"ok": True, "working_db": shop.working_db_path().name, "model": _team().model_name, "busy": _team().busy}
+    team = _team()
+    return {
+        "ok": True,
+        "working_db": shop.working_db_path().name,
+        "model": team.model_name,
+        "busy": team.busy,
+        "current_ticket": team.current_ticket,
+        "queue": list(team.queue),
+    }
 
 
 @app.get("/api/tickets", response_model=list[TicketSummary])
@@ -153,7 +162,7 @@ async def run_ticket(ticket_id: int) -> dict[str, Any]:
     ticket = _shop_call(shop.get_ticket, ticket_id)
     if ticket["status"] == "resolved":
         raise HTTPException(status_code=400, detail=f"Ticket {ticket_id} is already resolved")
-    _team().launch([ticket_id])
+    _team().launch([ticket_id], "a person started it from the dashboard")
     return {"ticket_id": ticket_id, "started": True}
 
 
@@ -170,14 +179,14 @@ def events(
 # --- Human approvals (these change cash) ------------------------------------
 
 
-def _rerun_after_decision(approval_id: int) -> int | None:
+def _rerun_after_decision(approval_id: int, decision: str) -> int | None:
     """A human decision on a ticket starts the team on that ticket, so it acts on the decision right away."""
     approval = next((a for a in shop.list_approvals() if a["id"] == approval_id), None)
     if approval is None or approval["ticket_id"] is None:
         return None
     if shop.get_ticket(approval["ticket_id"])["status"] == "resolved":
         return None
-    _team().request_run(approval["ticket_id"])
+    _team().request_run(approval["ticket_id"], f"{decision} approval #{approval_id}")
     return approval["ticket_id"]
 
 
@@ -193,7 +202,7 @@ async def approve(approval_id: int) -> ApprovalDecision:
     result = shop.approve_approval(approval_id, decided_by="human")
     if not result["ok"]:
         raise HTTPException(status_code=409, detail=result["error"])
-    rerun = _rerun_after_decision(approval_id)
+    rerun = _rerun_after_decision(approval_id, "approved")
     return ApprovalDecision(approval_id=approval_id, status="approved", result=result["result"], rerun_ticket_id=rerun)
 
 
@@ -205,14 +214,14 @@ class AnswerBody(BaseModel):
 async def answer(approval_id: int, body: AnswerBody) -> ApprovalDecision:
     """A human answers a question Boss asked with ask_human. The ticket runs again with the answer."""
     result = _shop_call(shop.answer_question, approval_id, body.answer, decided_by="human")
-    rerun = _rerun_after_decision(approval_id)
+    rerun = _rerun_after_decision(approval_id, "answered")
     return ApprovalDecision(approval_id=approval_id, status="approved", result=result["result"], rerun_ticket_id=rerun)
 
 
 @app.post("/api/approvals/{approval_id}/reject", response_model=ApprovalDecision)
 async def reject(approval_id: int, body: RejectBody) -> ApprovalDecision:
     _shop_call(shop.reject_approval, approval_id, reason=body.reason, decided_by="human")
-    rerun = _rerun_after_decision(approval_id)
+    rerun = _rerun_after_decision(approval_id, "declined")
     return ApprovalDecision(approval_id=approval_id, status="rejected", result=body.reason or "rejected", rerun_ticket_id=rerun)
 
 

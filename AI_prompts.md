@@ -257,3 +257,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** the project did not match the expected file layout, and the README did not cover the steps the assignment lists.
 
+### Follow-up 9: Flow and presentation
+
+> okay now the tickets aren't flowing naturally and I'm not being presented with stuff as I once was. can we fix this?
+
+**What was lacking:** runs could start or stay queued without a visible reason, and a server restart could leave a ticket stuck in progress.
+

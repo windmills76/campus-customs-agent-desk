@@ -981,6 +981,19 @@ def approvals_decided_since(ticket_id: int, since: str) -> list[int]:
         return [r["id"] for r in rows]
 
 
+def recover_interrupted_runs() -> list[int]:
+    """At startup, a ticket still marked in_progress was left by a run that the server stopped. Reopen it.
+    Nothing is run automatically: a person starts the next run from the dashboard."""
+    with connect() as c:
+        today = _today(c)
+        rows = _rows(c.execute("SELECT id FROM tickets WHERE status = 'in_progress'"))
+        for row in rows:
+            c.execute("UPDATE tickets SET status = 'open' WHERE id = ?", (row["id"],))
+            _note(c, row["id"], "reopened: the run was interrupted when the server stopped; start it again from the dashboard", today)
+            _log(c, "system", row["id"], "run", "run interrupted by a server restart; ticket reopened, not run again")
+        return [r["id"] for r in rows]
+
+
 def reopen_ticket(ticket_id: int, reason: str) -> dict[str, Any]:
     """Put a ticket back to open so the team runs it again. Used when a run's decision is out of date."""
     with connect() as c:

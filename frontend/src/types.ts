@@ -75,4 +75,6 @@ export interface Health {
   working_db: string;
   model: string;
   busy: boolean;
+  current_ticket: number | null;
+  queue: number[];
 }

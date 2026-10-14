@@ -113,8 +113,10 @@ class AgentTeam:
                 if decided_mid_run:
                     # A person decided something while the team was working, so this decision may be out of date.
                     # Reopen the ticket and run it again instead of recording a stale status.
-                    shop.reopen_ticket(ticket_id, f"approval(s) {decided_mid_run} decided during the run; running again")
+                    reason = f"approval(s) {decided_mid_run} decided during the run; running again"
+                    shop.reopen_ticket(ticket_id, reason)
                     self.queue.append(ticket_id)
+                    shop.log_event("system", ticket_id, "run", f"queued again: {reason}")
                 else:
                     shop.resolve_ticket(ticket_id, decision.outcome, decision.summary, agent="boss")
             except Exception as exc:  # keep the board honest if a model call or the database fails
@@ -123,19 +125,24 @@ class AgentTeam:
             finally:
                 self.current_ticket = None
 
-    def request_run(self, ticket_id: int) -> None:
-        """A human decision on a ticket starts a run on it. If the team is busy, the ticket waits in the queue."""
+    def request_run(self, ticket_id: int, reason: str) -> None:
+        """A human decision on a ticket starts a run on it. If the team is busy, the ticket waits in the queue.
+        The reason is written to the activity log so the board can show why every run happened."""
         if ticket_id in self.queue or ticket_id == self.current_ticket:
+            shop.log_event("system", ticket_id, "run", f"not queued again ({reason}); a run for this ticket is already queued or running")
             return
         if self.busy:
             self.queue.append(ticket_id)
+            shop.log_event("system", ticket_id, "run", f"queued behind the current run: {reason}")
         else:
-            self.launch([ticket_id])
+            self.launch([ticket_id], reason)
 
-    def launch(self, ticket_ids: list[int]) -> None:
+    def launch(self, ticket_ids: list[int], reason: str = "started from the dashboard") -> None:
         """Mark the team busy right away (so a second request is refused), then run in the background."""
         self.busy = True
         self.queue = list(ticket_ids)
+        for ticket_id in ticket_ids:
+            shop.log_event("system", ticket_id, "run", f"run started: {reason}")
         asyncio.get_running_loop().create_task(self.run_queue())
 
     async def run_queue(self) -> None:

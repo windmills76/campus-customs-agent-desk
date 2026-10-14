@@ -238,3 +238,22 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** the earlier review had open items that were unclear or unfinished.
 
+### Follow-up 6: How to do item 7
+
+> how do i do 7
+
+**Not a correction.**
+
+### Follow-up 7: Repeatable for a TA
+
+> is that going to be easily repeatable for a TA to download from the github repo to recreate? we should optimize for that
+
+**What was lacking:** the steps were not written so a TA could reproduce them from the repo alone.
+
+### Follow-up 8: Match the expected layout
+
+> okay we need to make this as easy to grade as possible. optimize it so that if a TA downloaded this project from a repo, they have their own portkey, and it follows the layout above
+[Image: the expected file layout (hw5/ tree) and the README requirements]
+
+**What was lacking:** the project did not match the expected file layout, and the README did not cover the steps the assignment lists.
+

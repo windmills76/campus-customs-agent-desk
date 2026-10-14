@@ -28,6 +28,18 @@ export interface Approval {
   ticket_subject?: string;
 }
 
+export interface OutboxDraft {
+  id: number;
+  ticket_id: number;
+  ticket_subject: string;
+  channel: string;
+  recipient: string;
+  body: string;
+  status: string;
+  created_by: string;
+  created_at: string;
+}
+
 export interface ActivityEvent {
   id: number;
   ts: string;

@@ -1,6 +1,6 @@
 # AI Prompts Log: Homework 5
 
-This file logs what I typed into the vibe coder while working on Homework 5. Each problem gets its own section. Prompts are copied word for word, typos included. Each message is labeled with the problem number and title it belongs to. Follow-ups are marked with the sentence on what the earlier prompt lacked.
+This file logs what I typed into the vibe coder while working on Homework 5. Each problem gets its own section. Prompts are copied word for word, typos included. Each message is labeled with the problem number and title it belongs to. Each follow-up either corrects an earlier prompt (marked **What was lacking**) or is marked **Not a correction**.
 
 ---
 
@@ -19,6 +19,26 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 ### Prompt 2: Create the prompt log
 
 > Problem 1 is called vibe coder prompts. create ai_prompts.md and keep it updated as you work. this file is the log of what I type into this vibe coder. Create one section for each problem while you execute the problems. Each section must include the problem number and title, at least one prompt typed in the wording I use, and one follow-up prompts if needed to correct something with an additional sentence on what was lacking after the first.
+
+---
+
+### Follow-up 2: Move the message to Problem 1
+
+> NO the previous message should go under problem 1.
+
+**What was lacking:** the message was not placed under Problem 1.
+
+### Follow-up 3: Rename and label
+
+> The current "follow up 2" prompt should be under the Problem 1 section because I'm now telling you how to build the homework assignment and we're doing with the context to this homework assignment. rename prompt 1 to introduction or background or something. I will say the problem number and the title before each message moving forward.
+
+**What was lacking:** the prompt 1 title was too specific, and the labels did not follow the instruction to put this message under Problem 1.
+
+### Follow-up 4: Listen to the previous message
+
+> you didn't listne to anything i said in the previous message.
+
+**What was lacking:** the earlier changes did not follow the instructions in the message before it.
 
 ---
 
@@ -88,9 +108,13 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 > you can stop it
 
+**What was lacking:** the first prompt did not say that port 8000 was taken by another project's server, so the backend could not start on that port.
+
 ### Follow-up 2: Open the dashboard
 
 > open the dashboard
+
+**Not a correction.**
 
 ---
 
@@ -104,17 +128,51 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 > approved everything
 
+**Not a correction.**
+
 ### Follow-up 2: Margin wording and the invoice question
 
 > it should say this is below the 29.33 margin level - want to re-edit this to 29.33? for 103 and then I can approve that, but then it gets stopped there because of the restock fee being more than the checking account. the t invoice from receipt also wasnt recorded against teh checking account -- why?
+
+**What was lacking:** the first answer said the price was below the floor without giving the margin percentage, and it did not explain that an invoice only exists after a shipment is received.
 
 ### Follow-up 3: Price choice and business cadence
 
 > 29.33 for 103 and what's the typical cadence a business follows in an instance similar to this?
 
+**Not a correction.**
+
 ### Follow-up 4: Blocked tickets
 
 > if an action is blocked, the ticket should record blocked and not remain "open"
+
+**What was lacking:** blocked tickets were shown as open, and a refused payment left the ticket unchanged.
+
+---
+
+### Follow-up 5: Build the ask
+
+> yes build the ask, move to accommodate inventory arrival
+
+**What was lacking:** there was no way for a person to give the team a price, and the desk date had not moved for the inventory arrival.
+
+### Follow-up 6: Approve the discount
+
+> approved it
+
+**Not a correction.**
+
+### Follow-up 7: Pay and restock
+
+> pay then request restock
+
+**Not a correction.**
+
+### Follow-up 8: Decisions trigger runs
+
+> i declined it in the system so is there a way to make my responses automatically trigger the agents to act with that instead of having to come back here to tell you what I did?
+
+**What was lacking:** decisions made on the dashboard did not start a run, so the team could not act on them without a message from you.
 
 ---
 
@@ -123,4 +181,60 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 ### Prompt 1: Fill in the Reflection tab
 
 > Problem 10 is called Reflection. Open desk_tickets.html and fill in the Reflection tab. I need you to edit my answers to be thorough and detailed, but help me evaluate: the performance of the agents on each ticket and why I think that? How each ticket compared to the expected that we wrote at the beginning, what could have been simpler as one agent with tools and why, three new problems that campus customs might face that this agent could solve with the tools built, and three new problems campus customs might face that this agent team could not solve with the tools wer built, and explain what we would need to add in order to solve these. tie every answer to this app and the three tickets we ran - use the ticket tabs and cash tab on the same page as our evidence. do not let this essay be generic AI stuff.
+
+---
+
+### Follow-up 1: Finish the Problem 9 deliverables
+
+> yes finish those now
+
+**What was lacking:** the Problem 9 deliverables (resolved files, board page, and harness) were not finished.
+
+### Follow-up 2: Stale status and screenshots
+
+> Fix the stale status bug and where can I validate the screenshots are located?
+
+**What was lacking:** the stale-status bug was known but not fixed, and the screenshot locations were not given.
+
+---
+
+## Problem 11: Submit to GitHub
+
+### Prompt 1: Publish the repository
+
+> problem 11 is called submit to github. Push this code to a public github repository so graders acna clone it. I'll submit the repo url as my submission, and it should also be in output/github_url.txt . Do not push the real env to the github repo. do include both databsed files under data/ so graders can run the app easily. read the attached screenshot for the expected file layout and note that README should explain, copy original DB to the working copy when we need a clean run, start mcp server, start fastAPI backend, start the react board, and reset the db before a full three-ticket run.
+
+---
+
+## Testing completed product
+
+### Follow-up 1: Another test run
+
+> can we run another test on this and have you show me what's happening
+
+**Not a correction.**
+
+### Follow-up 2: Pause and add a pending outbox
+
+> pause. we need an outbox of pending emails to send to customers about their orders and I need to see that on my dashboard under the approvals area
+
+**Not a correction.**
+
+### Follow-up 3: Name and sending rule
+
+> maybe make the title pending outbox and yes, do not send any emails.
+
+**What was lacking:** the outbox title and the rule against sending were not specified.
+
+### Follow-up 4: Triple-check the work
+
+> cna you triple check adherence to the information i submitted throughout all prompts submitted thus far? be thorough and flag any potential issues or things to fix. this is essential to do well on this assignment.
+
+**Not a correction.**
+
+### Follow-up 5: Fix the flagged items
+
+> 1. do this. 2. this ticket can be resolved by being blocked, right? not sure how to proceed since it's not supposed to be resolved. 3. complete the audit trail. 4. fix this. 5. add all runs and explanations of why additional comments were needed whenever that was the case. anything after problem 11 can fall under testing completed product. 6.  I just spoke about. 7. do this correctly. 8. please condense these to be as concise as possible.
+
+**What was lacking:** the earlier review had open items that were unclear or unfinished.
 

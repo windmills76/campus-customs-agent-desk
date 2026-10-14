@@ -618,6 +618,38 @@ def fulfill_order(ticket_id: int) -> dict[str, Any]:
         return {"ok": True, "ticket_id": ticket_id, "remaining_qty": row["qty"] - qty}
 
 
+def list_pending_drafts() -> list[dict[str, Any]]:
+    """The pending outbox: customer drafts waiting for a person to mark them ready or discard them."""
+    with connect() as c:
+        return _rows(
+            c.execute(
+                "SELECT d.*, t.subject AS ticket_subject FROM drafts d JOIN tickets t ON t.id = d.ticket_id "
+                "WHERE d.status = 'draft' ORDER BY d.id"
+            )
+        )
+
+
+def decide_draft(draft_id: int, decision: str, decided_by: str = "human") -> dict[str, Any]:
+    """A person marks a draft ready to send or discards it. This never sends anything: the app has no email channel."""
+    if decision not in ("ready", "discarded"):
+        raise ShopError("decision must be ready or discarded")
+    with connect() as c:
+        today = _today(c)
+        draft = _one(c, "SELECT * FROM drafts WHERE id = ?", (draft_id,))
+        if draft is None:
+            raise ShopError(f"Draft {draft_id} not found")
+        if draft["status"] != "draft":
+            raise ShopError(f"Draft {draft_id} is already {draft['status']}")
+        c.execute("UPDATE drafts SET status = ? WHERE id = ?", (decision, draft_id))
+        if decision == "ready":
+            text = f"draft #{draft_id} marked ready to send by a person; the app did not send it"
+        else:
+            text = f"draft #{draft_id} discarded by a person"
+        _note(c, draft["ticket_id"], text, today)
+        _log(c, decided_by, draft["ticket_id"], "outbox", text)
+        return {"ok": True, "draft_id": draft_id, "status": decision, "sent": False}
+
+
 def create_draft(
     ticket_id: int,
     body: str,

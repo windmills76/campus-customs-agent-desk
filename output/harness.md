@@ -21,7 +21,7 @@ The spec lists this table as "deck". The database calls it `desk`.
 | date_today | TEXT, not null | The shop's "today". Every overdue check uses it. |
 | notes | TEXT | Free text for the desk. Empty today. |
 
-**Why it matters:** this single date decides what is overdue, which invoices are late, and when rent falls due. Agents must read it instead of the system clock.
+**Why it matters:** this single date decides what is overdue, which invoices are late, and when rent falls due.
 
 ### tickets
 
@@ -40,7 +40,7 @@ The spec lists this table as "deck". The database calls it `desk`.
 | notes | TEXT | Running history of the ticket. |
 | created_at | TEXT, not null | Timestamp with a timezone offset. |
 
-**Why it matters:** this is the board. Boss reads each ticket, routes it, and writes the final status. The `sku`, `lease_id`, and `invoice_id` links tell each specialist which other tables to open.
+**Why it matters:** this is the board Boss reads on every run.
 
 ### inventory
 
@@ -52,7 +52,7 @@ The spec lists this table as "deck". The database calls it `desk`.
 | qty | INTEGER, not null | Units on hand. |
 | location | TEXT, not null | Aisle where the product sits. |
 
-**Why it matters:** the inventory agent compares this quantity with what a ticket needs to find a shortfall. The composite key means stock is tracked per size.
+**Why it matters:** the inventory agent compares this quantity with what a ticket needs to find a shortfall.
 
 ### pricing
 
@@ -86,7 +86,7 @@ The spec lists this table as "deck". The database calls it `desk`.
 | status | TEXT, not null | `open` or `paid`. Only `open` counts as owed. |
 | description | TEXT | What was billed. |
 
-**Why it matters:** a vendor with an open invoice will not ship new product. Accounting must pay blocking invoices before the inventory agent can restock from that vendor.
+**Why it matters:** a vendor with an open invoice will not ship new product.
 
 ### leases
 
@@ -109,7 +109,7 @@ The spec lists this table as "deck". The database calls it `desk`.
 | balance | REAL, not null | Cash on hand. |
 | date | TEXT, not null | Date of the balance. |
 
-**Why it matters:** every payment is checked against this balance. The pay step refuses any payment that would make it negative. Cash only goes out, so the balance only falls.
+**Why it matters:** every payment is checked against this balance.
 
 ### payments
 
@@ -123,7 +123,7 @@ The spec lists this table as "deck". The database calls it `desk`.
 | paid_at | TEXT, not null | Date paid. |
 | approved_by | TEXT, not null | Who approved it. Required because human approval is mandatory. |
 
-**Why it matters:** this is the record of cash out. Every approved payment must appear here and must change `cash_accounts` and `invoices` to match. It is empty at the start.
+**Why it matters:** this is the record of cash out.
 
 ## How the three open tickets link
 
@@ -166,21 +166,21 @@ The MCP server in `mcp_server/server.py` has three read-only tools, one for each
 
 - **Reads:** `inventory`
 - **Unlocks:** ticket 103, the hoodie discount request (Yale AI Club, `CC-HOOD-NAVY` size M, 20 units)
-- **Why this tool:** Ticket 103 cannot be decided until someone knows how many size-M hoodies are on hand. The tool returns 8 on hand against the 20 requested, so the shortfall of 12 is computed from the stored quantity rather than estimated, and that 12-unit gap is what drives the restock and discount decision. It also returns the shelf location, `Aisle A`, so the team can point to where the stock sits.
+- **Why this tool:** Ticket 103 cannot be decided until someone knows how many size-M hoodies are on hand.
 - **Also useful for:** ticket 101, with the same call for `CC-TEE-WHITE` size `S`. It returns 0 on hand against 1 needed, a shortfall of 1.
 
 ### 2. `list_open_vendor_invoices(vendor_id?)`
 
 - **Reads:** `invoices`, `vendors`, `desk`
 - **Unlocks:** ticket 101, the size-S tee order (Tauhid Zaman)
-- **Why this tool:** The size-S tee cannot be restocked until the vendor is free to ship. The only apparel vendor, Bulldog Print Co (`vendor_id` 1), is blocked by invoice 501 for $840.00, which is still `open` and was due 2026-08-28. Against the desk date of 2026-08-31 the tool reports it as overdue by 3 days, and it lists vendor 1 in `vendor_ids_blocked_from_shipping`. That is the exact fact the team needs to route the bill to accounting before any restock is requested. The tool joins `vendors` so the answer names the supplier and its 5-day lead time, not just an id.
+- **Why this tool:** The size-S tee cannot be restocked until the vendor is free to ship.
 - **Also useful for:** ticket 103, which restocks from the same apparel vendor and so is blocked by the same invoice.
 
 ### 3. `get_lease_rent_status(lease_id)`
 
 - **Reads:** `leases`, `desk`
 - **Unlocks:** ticket 102, the rent notice from Elm City Properties
-- **Why this tool:** The rent notice says rent is due in two days, and the team needs to confirm that against the database before acting. The tool returns the Chapel Street shop lease (`lease_id` 1) with a $2,400.00 monthly rent and a `next_due` of 2026-09-02. It measures `days_until_due` against the desk date of 2026-08-31, which gives 2, and reports `overdue` as false. That lets facilities request the payment on time without treating it as late.
+- **Why this tool:** The rent notice says rent is due in two days, and the team needs to confirm that against the database before acting.
 
 ### Notes on the server
 
@@ -253,15 +253,18 @@ Start from the `backend` folder: `uvicorn main:app --reload --port 8000`. The da
 - `GET /api/cash/balance`: current checking balance from `cash_accounts`, with pending payments and what remains after them.
 - `POST /api/desk/date`: a human moves the shop's "today" forward. Shipments whose ETA has arrived are received.
 - `POST /api/reset`: replace the working copy with the original database. The original file is only read.
+- `GET /api/outbox`: pending customer drafts for the Pending outbox section. Nothing in the outbox is sent by the app.
+- `POST /api/outbox/{draft_id}/ready`: a person marks a draft ready to send. The app records the decision and does not send the draft.
+- `POST /api/outbox/{draft_id}/discard`: a person discards a draft.
 
 ## Tables added by the app
 
 These are not in the original database. They are created in the working copy by `ensure_schema` (`mcp_server/shop.py`), and the reset removes them.
 
-- **approvals:** every request a person must decide. Columns: `id`, `kind` (invoice_payment, rent_payment, purchase_order, discount, question), `ticket_id`, `ref_id`, `amount`, `payload`, `summary`, `status` (pending, approved, rejected), `requested_by`, `requested_at`, `decided_by`, `decided_at`, `result`. Why it matters: nothing spends cash without a row here marked approved by a human.
-- **drafts:** customer messages saved on a ticket. Columns: `id`, `ticket_id`, `channel`, `recipient`, `body`, `status` (always draft), `created_by`, `created_at`. Why it matters: drafts stay on the board, and nothing is sent.
-- **purchase_orders:** restock orders. Columns: `id`, `vendor_id`, `sku`, `size`, `qty`, `unit_cost`, `ticket_id`, `approval_id`, `ordered_on`, `eta`, `status` (in_transit, received), `invoice_id`, `received_on`. Why it matters: the ETA comes from the vendor's lead days, and receipt adds stock and creates the vendor invoice.
-- **activity_log:** every agent message, tool call, tool result, delegation, decision, approval, and human note. Columns: `id`, `ts`, `agent`, `ticket_id`, `event`, `detail`. Why it matters: it feeds the dashboard and is the audit trail.
+- **approvals:** every request a person must decide. Columns: `id`, `kind` (invoice_payment, rent_payment, purchase_order, discount, question), `ticket_id`, `ref_id`, `amount`, `payload`, `summary`, `status` (pending, approved, rejected), `requested_by`, `requested_at`, `decided_by`, `decided_at`, `result`. Why it matters: no cash moves without an approved row here.
+- **drafts:** customer messages saved on a ticket. Columns: `id`, `ticket_id`, `channel`, `recipient`, `body`, `status` (always draft), `created_by`, `created_at`. Why it matters: drafts stay on the board and are never sent.
+- **purchase_orders:** restock orders. Columns: `id`, `vendor_id`, `sku`, `size`, `qty`, `unit_cost`, `ticket_id`, `approval_id`, `ordered_on`, `eta`, `status` (in_transit, received), `invoice_id`, `received_on`. Why it matters: receipt adds stock and creates the vendor invoice.
+- **activity_log:** every agent message, tool call, tool result, delegation, decision, approval, and human note. Columns: `id`, `ts`, `agent`, `ticket_id`, `event`, `detail`. Why it matters: it is the audit trail and feeds the dashboard.
 - **tickets, new columns:** `assigned_to`, `resolution` (the team's final summary), `fulfilled_at`.
 
 ## MCP tools (full list)

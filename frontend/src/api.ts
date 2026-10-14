@@ -1,4 +1,4 @@
-import type { ActivityEvent, Approval, CashBalance, Health, TicketDetail, TicketSummary } from "./types";
+import type { ActivityEvent, Approval, CashBalance, Health, OutboxDraft, TicketDetail, TicketSummary } from "./types";
 
 // The backend runs on port 8000. Set VITE_API_URL in frontend/.env to point somewhere else.
 export const API_URL: string = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
@@ -41,6 +41,9 @@ export const api = {
     request(`/api/approvals/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) }),
   answer: (id: number, answer: string) =>
     request(`/api/approvals/${id}/answer`, { method: "POST", body: JSON.stringify({ answer }) }),
+  outbox: () => request<OutboxDraft[]>("/api/outbox"),
+  draftReady: (id: number) => request(`/api/outbox/${id}/ready`, { method: "POST" }),
+  draftDiscard: (id: number) => request(`/api/outbox/${id}/discard`, { method: "POST" }),
   addNote: (ticketId: number, note: string) =>
     request(`/api/tickets/${ticketId}/notes`, { method: "POST", body: JSON.stringify({ note }) }),
   cash: () => request<CashBalance>("/api/cash/balance"),

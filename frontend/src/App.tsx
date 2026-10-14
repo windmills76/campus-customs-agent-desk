@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "./api";
-import type { ActivityEvent, Approval, CashBalance, TicketDetail, TicketSummary } from "./types";
+import type { ActivityEvent, Approval, CashBalance, OutboxDraft, TicketDetail, TicketSummary } from "./types";
 import { Header } from "./components/Header";
 import { TicketList } from "./components/TicketList";
 import { TicketPanel } from "./components/TicketPanel";
@@ -20,6 +20,7 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [tickets, setTickets] = useState<TicketSummary[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [outbox, setOutbox] = useState<OutboxDraft[]>([]);
   const [cash, setCash] = useState<CashBalance | null>(null);
   // ?ticket=101 opens the desk with that ticket already selected (handy for links and screenshots).
   const initialTicket = (() => {
@@ -62,12 +63,14 @@ export function App() {
 
   const refresh = useCallback(async () => {
     try {
-      const [health, board, pending, balance] = await Promise.all([
+      const [health, board, pending, balance, drafts] = await Promise.all([
         api.health(),
         api.tickets(),
         api.pendingApprovals(),
         api.cash(),
+        api.outbox(),
       ]);
+      setOutbox(drafts);
       setOnline(true);
       setBusy(health.busy);
       busyRef.current = health.busy;
@@ -131,6 +134,26 @@ export function App() {
     } catch (error) {
       setStartError(message(error));
     }
+  };
+
+  const markReady = async (draft: OutboxDraft) => {
+    try {
+      await api.draftReady(draft.id);
+      notify(`Draft #${draft.id} marked ready. Nothing was sent; send it yourself.`, "success");
+    } catch (error) {
+      notify(message(error), "error");
+    }
+    await refresh();
+  };
+
+  const discardDraft = async (draft: OutboxDraft) => {
+    try {
+      await api.draftDiscard(draft.id);
+      notify(`Draft #${draft.id} discarded.`);
+    } catch (error) {
+      notify(message(error), "error");
+    }
+    await refresh();
   };
 
   const addNote = async (ticketId: number, note: string) => {
@@ -223,6 +246,9 @@ export function App() {
           onApprove={approve}
           onReject={reject}
           onAnswer={answer}
+          outbox={outbox}
+          onMarkReady={markReady}
+          onDiscard={discardDraft}
         />
       </main>
 

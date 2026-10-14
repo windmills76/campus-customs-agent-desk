@@ -111,3 +111,13 @@ def test_human_decision_starts_a_run_on_its_ticket(client):
             break
         time.sleep(0.05)
     assert client.calls == [102]
+
+
+def test_outbox_lists_drafts_and_nothing_is_sent(client):
+    draft = shop.create_draft(101, body="Your size S tee is being prepared.", recipient="Tauhid Zaman")
+    outbox = client.get("/api/outbox").json()
+    assert [d["id"] for d in outbox] == [draft["draft_id"]] and outbox[0]["status"] == "draft"
+    response = client.post(f"/api/outbox/{draft['draft_id']}/ready")
+    assert response.status_code == 200 and response.json()["sent"] is False
+    assert client.get("/api/outbox").json() == []
+    assert client.post(f"/api/outbox/{draft['draft_id']}/discard").status_code == 400  # already decided

@@ -123,6 +123,23 @@ class NoteBody(BaseModel):
     note: str
 
 
+@app.get("/api/outbox")
+def outbox() -> list[dict[str, Any]]:
+    """Pending customer drafts. Nothing in this outbox is ever sent by the app."""
+    return shop.list_pending_drafts()
+
+
+@app.post("/api/outbox/{draft_id}/ready")
+def outbox_ready(draft_id: int) -> dict[str, Any]:
+    """A person marks a draft ready to send. The app does not send it; the person sends it."""
+    return _shop_call(shop.decide_draft, draft_id, "ready", decided_by="human")
+
+
+@app.post("/api/outbox/{draft_id}/discard")
+def outbox_discard(draft_id: int) -> dict[str, Any]:
+    return _shop_call(shop.decide_draft, draft_id, "discarded", decided_by="human")
+
+
 @app.post("/api/tickets/{ticket_id}/notes")
 def add_note(ticket_id: int, body: NoteBody) -> dict[str, Any]:
     """A human adds information to a ticket, such as the target price for a discount. The next run reads it."""

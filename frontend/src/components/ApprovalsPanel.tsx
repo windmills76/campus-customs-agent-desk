@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Approval } from "../types";
+import type { Approval, OutboxDraft } from "../types";
 import { kindLabel, money, timeOf } from "../format";
 
 interface ApprovalsPanelProps {
@@ -8,11 +8,14 @@ interface ApprovalsPanelProps {
   onApprove: (approval: Approval) => Promise<void>;
   onReject: (approval: Approval) => Promise<void>;
   onAnswer: (approval: Approval, answer: string) => Promise<void>;
+  outbox: OutboxDraft[];
+  onMarkReady: (draft: OutboxDraft) => Promise<void>;
+  onDiscard: (draft: OutboxDraft) => Promise<void>;
 }
 
 const MONEY_KINDS = new Set(["invoice_payment", "rent_payment", "purchase_order"]);
 
-export function ApprovalsPanel({ approvals, selectedTicketId, onApprove, onReject, onAnswer }: ApprovalsPanelProps) {
+export function ApprovalsPanel({ approvals, selectedTicketId, onApprove, onReject, onAnswer, outbox, onMarkReady, onDiscard }: ApprovalsPanelProps) {
   // Requests for the open ticket come first, then everything else on the board.
   const ordered = [...approvals].sort((a, b) => {
     const aHere = a.ticket_id === selectedTicketId ? 0 : 1;
@@ -45,7 +48,64 @@ export function ApprovalsPanel({ approvals, selectedTicketId, onApprove, onRejec
           ))}
         </ul>
       )}
+
+      <div className="outbox">
+        <div className="column-head">
+          <h2>Pending outbox</h2>
+          <span className="count">{outbox.length}</span>
+        </div>
+        <p className="outbox-note">Customer drafts for you to review. Nothing here is sent by the app.</p>
+        {outbox.length === 0 ? (
+          <div className="empty-state small">
+            <div className="empty-title">No drafts waiting</div>
+          </div>
+        ) : (
+          <ul className="approval-list">
+            {outbox.map((draft) => (
+              <OutboxCard key={draft.id} draft={draft} onMarkReady={onMarkReady} onDiscard={onDiscard} />
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
+  );
+}
+
+function OutboxCard({
+  draft,
+  onMarkReady,
+  onDiscard,
+}: {
+  draft: OutboxDraft;
+  onMarkReady: (draft: OutboxDraft) => Promise<void>;
+  onDiscard: (draft: OutboxDraft) => Promise<void>;
+}) {
+  const [working, setWorking] = useState(false);
+  const act = async (fn: (d: OutboxDraft) => Promise<void>) => {
+    setWorking(true);
+    try {
+      await fn(draft);
+    } finally {
+      setWorking(false);
+    }
+  };
+  return (
+    <li className="approval-card outbox-card">
+      <div className="approval-top">
+        <span className="kind">Customer draft #{draft.id}</span>
+        <span className="muted">{draft.channel}</span>
+      </div>
+      <div className="approval-ticket">To {draft.recipient} · Ticket #{draft.ticket_id}, {draft.ticket_subject}</div>
+      <p className="approval-summary draft-body">{draft.body}</p>
+      <div className="approval-actions">
+        <button className="primary-button" onClick={() => act(onMarkReady)} disabled={working}>
+          Mark ready to send
+        </button>
+        <button className="ghost-button" onClick={() => act(onDiscard)} disabled={working}>
+          Discard
+        </button>
+      </div>
+    </li>
   );
 }
 

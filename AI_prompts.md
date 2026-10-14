@@ -311,3 +311,9 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **What was lacking:** the reflection had no pointers to the specific ticket tabs, cash rows, or tables behind each point, several "what I would fix" items were out of date, and the board screenshots and captions did not match the kept session.
 
+### Follow-up 18: Reflection status for 101 and 103
+
+> change the reflection to update 101 to waiting on stock and blocked for 103
+
+**Not a correction.**
+

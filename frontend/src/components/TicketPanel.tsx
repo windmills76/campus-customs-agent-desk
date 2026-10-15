@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ActivityEvent, TicketDetail, TicketSummary } from "../types";
 import { AGENTS, AGENT_KEYS, agentViews, currentRun, isAgentKey, runSummary } from "../agents";
 import type { AgentKey, AgentView } from "../agents";
-import { money, stateLabel, statusLabel, timeOf, typeLabel } from "../format";
+import { agentLabel, money, stateLabel, statusLabel, timeOf, typeLabel } from "../format";
 
 interface TicketPanelProps {
   summary: TicketSummary | undefined;
@@ -49,6 +49,7 @@ export function TicketPanel({ summary, detail, events, busy, runningHere, onStar
           </div>
           <div className="hero-tags">
             <span className={`state-pill ${summary.state}`}>{stateLabel(summary.state)}</span>
+            <span className={`agent-pill ${summary.agent_outcome}`}>{agentLabel(summary.agent_outcome)}</span>
             {statusLabel(summary.status) !== stateLabel(summary.state) && (
               <span className="status-tag">{statusLabel(summary.status)}</span>
             )}

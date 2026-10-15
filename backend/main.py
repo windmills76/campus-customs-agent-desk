@@ -95,6 +95,7 @@ def _summary(ticket: dict[str, Any]) -> TicketSummary:
         ),
         overdue=ticket["overdue"],
         pending_approvals=ticket["pending_approvals"],
+        agent_outcome=ticket.get("agent_outcome") or "complete",
     )
 
 

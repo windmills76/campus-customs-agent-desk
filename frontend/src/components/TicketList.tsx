@@ -1,5 +1,5 @@
 import type { TicketSummary } from "../types";
-import { stateLabel, statusLabel, typeLabel } from "../format";
+import { agentLabel, stateLabel, statusLabel, typeLabel } from "../format";
 
 interface TicketListProps {
   tickets: TicketSummary[];
@@ -35,6 +35,7 @@ export function TicketList({ tickets, selectedId, runningId, onSelect }: TicketL
                   {typeLabel(ticket.type)} · {ticket.requester}
                 </div>
                 <div className="ticket-foot">
+                  <span className={`agent-pill ${ticket.agent_outcome}`}>{agentLabel(ticket.agent_outcome)}</span>
                   <span className={`status-text ${running ? "running" : ""}`}>
                     {running ? "Team working…" : statusLabel(ticket.status)}
                   </span>

@@ -11,6 +11,7 @@ export interface TicketSummary {
   state: TicketState;
   overdue: boolean;
   pending_approvals: number;
+  agent_outcome: "complete" | "needs_you";
 }
 
 export interface Approval {

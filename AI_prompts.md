@@ -341,3 +341,15 @@ This file logs what I typed into the vibe coder while working on Homework 5. Eac
 
 **Not a correction.**
 
+### Follow-up 23: Agent outcome versus ticket status
+
+> okay so i received feedback that the agent is resolved once there are no more prompts for the human, but the ticket itself doesn't have to be resolved given the current status. what does this mean for the categorization we currently have?
+
+**What was lacking:** "resolved" meant both that the agent had finished and that the ticket was fulfilled, so the categories mixed two different states.
+
+### Follow-up 24: Make the change
+
+> Yes because the professor said I figured out the key to this and this is it.
+
+**Not a correction.**
+

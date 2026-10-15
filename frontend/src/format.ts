@@ -14,6 +14,8 @@ const STATUS_LABELS: Record<string, string> = {
 export const stateLabel = (state: string) =>
   state === "resolved" ? "Resolved" : state === "blocked" ? "Blocked" : state === "waiting" ? "Pending inventory" : "Open";
 
+export const agentLabel = (outcome: string) => (outcome === "needs_you" ? "Agent needs you" : "Agent complete");
+
 export const statusLabel = (status: string) => STATUS_LABELS[status] ?? status.replace(/_/g, " ");
 
 const KIND_LABELS: Record<string, string> = {

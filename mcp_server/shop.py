@@ -111,7 +111,7 @@ def working_db_path() -> Path:
 def ensure_schema(conn: sqlite3.Connection) -> None:
     """Add the homework tables and ticket columns. Safe to run every time."""
     ticket_cols = {row["name"] for row in conn.execute("PRAGMA table_info(tickets)")}
-    for col in ("assigned_to", "resolution", "fulfilled_at"):
+    for col in ("assigned_to", "resolution", "fulfilled_at", "agent_outcome"):
         if col not in ticket_cols:
             conn.execute(f"ALTER TABLE tickets ADD COLUMN {col} TEXT")
     conn.executescript(EXTRA_SCHEMA)
@@ -592,25 +592,44 @@ def add_ticket_note(ticket_id: int, note: str, agent: str) -> dict[str, Any]:
         return {"ok": True, "ticket_id": ticket_id}
 
 
+def _open_shortfall(c: sqlite3.Connection, ticket: dict[str, Any]) -> int:
+    """Units still missing for a ticket's item. Zero when there is no item, the order is fulfilled, or stock covers it."""
+    if not ticket["sku"] or not ticket["qty"] or ticket["fulfilled_at"]:
+        return 0
+    on_hand = _one(c, "SELECT qty FROM inventory WHERE sku = ? AND size = ?", (ticket["sku"], ticket["size"]))
+    return max(0, int(ticket["qty"]) - int(on_hand["qty"] if on_hand else 0))
+
+
 def resolve_ticket(ticket_id: int, outcome: str, summary: str, agent: str = "boss") -> dict[str, Any]:
-    """Boss's final call. outcome is resolved, awaiting_approval, waiting_stock or blocked."""
+    """Record the team's final call. Two separate things are recorded:
+
+    - agent_outcome: 'needs_you' while a person has an open request on this ticket, otherwise 'complete'.
+      The team is finished with its work when nothing is waiting for a person.
+    - status: where the customer's order stands. A ticket is 'resolved' only when it is fulfilled.
+      If the team says resolved but stock is still short, the ticket is 'waiting_stock' (pending inventory).
+    """
     if outcome not in OUTCOMES:
         raise ShopError(f"outcome must be one of {', '.join(OUTCOMES)}")
     with connect() as c:
         today = _today(c)
         ticket = _ticket_or_raise(c, ticket_id)
-        if outcome == "resolved" and ticket["sku"] and ticket["qty"] and not ticket["fulfilled_at"]:
-            on_hand = _one(c, "SELECT qty FROM inventory WHERE sku = ? AND size = ?", (ticket["sku"], ticket["size"]))
-            short = int(ticket["qty"]) - int(on_hand["qty"] if on_hand else 0)
-            if short > 0:
-                raise ShopError(f"cannot resolve: {short} unit(s) still short for {ticket['sku']} {ticket['size']}; use waiting_stock or blocked")
+        pending = c.execute(
+            "SELECT COUNT(*) AS n FROM approvals WHERE ticket_id = ? AND status = 'pending'", (ticket_id,)
+        ).fetchone()["n"]
+        agent_outcome = "needs_you" if pending else "complete"
+        if outcome == "resolved":
+            status = "waiting_stock" if _open_shortfall(c, ticket) > 0 else "resolved"
+        elif outcome == "awaiting_approval" and not pending:
+            status = "open"  # nothing is waiting for a person any more, so the ticket is open for another run
+        else:
+            status = outcome
         c.execute(
-            "UPDATE tickets SET status = ?, resolution = ? WHERE id = ?",
-            (outcome, summary, ticket_id),
+            "UPDATE tickets SET status = ?, resolution = ?, agent_outcome = ? WHERE id = ?",
+            (status, summary, agent_outcome, ticket_id),
         )
-        _note(c, ticket_id, f"{agent} decision -> {outcome}: {summary}", today)
-        _log(c, agent, ticket_id, "decision", f"{outcome}: {summary}")
-        return {"ok": True, "ticket_id": ticket_id, "status": outcome}
+        _note(c, ticket_id, f"agent {agent_outcome}; ticket {status}: {summary}", today)
+        _log(c, agent, ticket_id, "decision", f"agent {agent_outcome}; ticket {status}: {summary}")
+        return {"ok": True, "ticket_id": ticket_id, "status": status, "agent_outcome": agent_outcome}
 
 
 def fulfill_order(ticket_id: int) -> dict[str, Any]:

@@ -340,7 +340,7 @@ These are enforced in code, not only in the prompts:
 - Reset to the original values. Starting checking balance: $3,400.00.
 - Fourteen team runs in the original run: ticket 101 three times, 102 twice, 103 nine times. Testing after Problem 11 added more runs, all in `output/audit_trail.json`. Events are in `output/audit_trail.json` (JSON lines, one event per line).
 - Seven requests: six approved (three payments, one purchase order, one discount, one answered question) and one declined (purchase order #7). Details are in `output/resolved_tickets.json`.
-- Ticket 101: payments resolved; pending inventory arriving to be fulfilled (not resolved). Ticket 102: resolved. Ticket 103: pending inventory (not resolved).
+- Ticket 101: agent complete; payments resolved; ticket pending inventory (not resolved). Ticket 102: agent complete; ticket resolved. Ticket 103: agent complete; ticket pending inventory (not resolved).
 - Checking ends at $160.00 in the kept session (invoice 501 and rent paid). The original run ended at $152.00 after an $8.00 bill was paid on arrival.00. The cash itemization is on the cash tab of `output/desk_tickets.html`.
 - Known issue: a decision recorded after an approval executes during a run can overwrite the ticket's status. This happened on tickets 101 and 103 and is described in the reflection tab.
 
@@ -348,7 +348,7 @@ These are enforced in code, not only in the prompts:
 
 - **Run reasons.** Every run records why it started: a decision, a human start, a queue entry, or a reopen. The dashboard shows the running ticket and the queue.
 - **Restart recovery.** A ticket left `in_progress` by a server restart is reopened at startup, with a note. It is not run again automatically.
-- **Resolution guard.** A ticket cannot be resolved while stock for it is still short. The team records the refusal as blocked, with the reason.
+- **Two statuses.** The agent outcome (complete or needs you) is separate from the ticket status (open, pending inventory, blocked, or resolved). The team is complete when no person has an open request. A ticket is resolved only when it is fulfilled. If the team says resolved but stock is short, the ticket becomes pending inventory.
 - **Waiting on stock.** Tickets waiting for a shipment show as "Waiting on stock," not "Open," and are not resolved.
 - **Stale-decision fix.** If an approval is decided during a run, the ticket reopens and runs again. Tested live on ticket 101.
 - **Pending outbox.** Customer drafts appear under the approvals area. "Mark ready to send" and "Discard" record a decision only. Nothing is sent.

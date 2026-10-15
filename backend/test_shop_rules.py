@@ -184,11 +184,21 @@ def test_interrupted_run_is_reopened_not_rerun(shop_db):
     assert shop_db.recover_interrupted_runs() == []
 
 
-def test_cannot_resolve_while_stock_is_short(shop_db):
-    with pytest.raises(shop.ShopError, match="still short"):
-        shop_db.resolve_ticket(103, "resolved", "discount approved, hoodies to come")
-    shop_db.resolve_ticket(103, "waiting_stock", "12 hoodies still to restock")
-    assert shop_db.get_ticket(103)["status"] == "waiting_stock"
+def test_agent_can_finish_while_the_ticket_waits_for_stock(shop_db):
+    result = shop_db.resolve_ticket(103, "resolved", "discount approved, hoodies to come")
+    assert result["agent_outcome"] == "complete" and result["status"] == "waiting_stock"
+    ticket = shop_db.get_ticket(103)
+    assert ticket["status"] == "waiting_stock" and ticket["agent_outcome"] == "complete"
+
+
+def test_ticket_resolves_only_when_fulfilled(shop_db):
+    assert shop_db.resolve_ticket(102, "resolved", "rent paid")["status"] == "resolved"
+
+
+def test_open_human_request_means_agent_needs_you(shop_db):
+    shop_db.request_human_answer(103, "What unit price should the discount use?")
+    result = shop_db.resolve_ticket(103, "awaiting_approval", "waiting for the price")
+    assert result["agent_outcome"] == "needs_you" and result["status"] == "awaiting_approval"
 
 
 def test_resolves_once_the_order_is_fulfilled(shop_db):

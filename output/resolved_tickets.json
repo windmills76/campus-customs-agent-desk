@@ -29,10 +29,8 @@
     {
       "ticket_id": 101,
       "subject": "Bulldog tee",
-      "final_status": "waiting_stock",
-      "state": "waiting",
-      "short_outcome": "Payment resolved: invoice 501 ($840.00) paid (approval #1), and the purchase order for one tee ($8.00, approval #2) is placed with ETA 2026-09-05. The ticket is pending inventory arriving to be fulfilled; it is not resolved.",
-      "final_team_decision": "Payment resolved: invoice 501 ($840.00) paid (approval #1), and the purchase order for one tee ($8.00, approval #2) is placed with ETA 2026-09-05. The ticket is pending inventory arriving to be fulfilled; it is not resolved.",
+      "short_outcome": "Agent complete. Payments resolved: invoice 501 ($840.00) paid (approval #1), and the purchase order for one tee ($8.00, approval #2) is placed with ETA 2026-09-05. Ticket pending inventory arriving to be fulfilled; it is not resolved.",
+      "final_team_decision": "Agent complete. Payments resolved: invoice 501 ($840.00) paid (approval #1), and the purchase order for one tee ($8.00, approval #2) is placed with ETA 2026-09-05. Ticket pending inventory arriving to be fulfilled; it is not resolved.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 7,
@@ -114,15 +112,15 @@
           "summary": "Order 1 x CC-TEE-WHITE (S) from Bulldog Print Co at $8.00, total $8.00, ETA 2026-09-05",
           "result": "placed PO #1, ETA 2026-09-05"
         }
-      ]
+      ],
+      "agent_outcome": "complete",
+      "ticket_status": "waiting_stock"
     },
     {
       "ticket_id": 102,
       "subject": "Rent due",
-      "final_status": "resolved",
-      "state": "resolved",
-      "short_outcome": "Resolved. Rent of $2,400.00 paid after approval #3; next due date moved from 2026-09-02 to 2026-10-02.",
-      "final_team_decision": "Resolved. Rent of $2,400.00 paid after approval #3; next due date moved from 2026-09-02 to 2026-10-02.",
+      "short_outcome": "Agent complete. Ticket resolved: rent of $2,400.00 paid after approval #3; next due date moved from 2026-09-02 to 2026-10-02.",
+      "final_team_decision": "Agent complete. Ticket resolved: rent of $2,400.00 paid after approval #3; next due date moved from 2026-09-02 to 2026-10-02.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 4,
@@ -172,15 +170,15 @@
           "summary": "Pay rent for Chapel Street shop to Elm City Properties $2400.00 (due 2026-09-02)",
           "result": "paid rent $2400.00; next due 2026-10-02"
         }
-      ]
+      ],
+      "agent_outcome": "complete",
+      "ticket_status": "resolved"
     },
     {
       "ticket_id": 103,
       "subject": "Bulk hoodie discount",
-      "final_status": "waiting_stock",
-      "state": "waiting",
-      "short_outcome": "Pending inventory. Discount approved at $29.33 (approvals #5, #6 and #7; #5 and #6 are duplicates at $29.34 and are kept as history). The team reports 12 hoodies missing with no new order possible while PO #1 is in transit (ETA 2026-09-05). Once it arrives, a $264.00 restock would need cash the shop does not have, so the ticket may return to blocked.",
-      "final_team_decision": "Pending inventory. Discount approved at $29.33 (approvals #5, #6 and #7; #5 and #6 are duplicates at $29.34 and are kept as history). The team reports 12 hoodies missing with no new order possible while PO #1 is in transit (ETA 2026-09-05). Once it arrives, a $264.00 restock would need cash the shop does not have, so the ticket may return to blocked.",
+      "short_outcome": "Agent complete. Ticket pending inventory: discount approved at $29.33 (approval #7; #5 and #6 are duplicates at $29.34, kept as history). 12 hoodies missing; no new order while PO #1 is in transit (ETA 2026-09-05). A $264.00 restock would need more cash than checking holds, so the ticket may return to blocked.",
+      "final_team_decision": "Agent complete. Ticket pending inventory: discount approved at $29.33 (approval #7; #5 and #6 are duplicates at $29.34, kept as history). 12 hoodies missing; no new order while PO #1 is in transit (ETA 2026-09-05). A $264.00 restock would need more cash than checking holds, so the ticket may return to blocked.",
       "agents_contributed": {
         "boss": {
           "tool_calls": 29,
@@ -290,8 +288,11 @@
           "summary": "Discount 20 x CC-HOOD-NAVY (M) to $29.33 each (list $58.00, margin 24.99%)",
           "result": "approved at $29.33"
         }
-      ]
+      ],
+      "agent_outcome": "complete",
+      "ticket_status": "waiting_stock"
     }
   ],
-  "record_basis": "Status, payments, approvals, and ending balance: kept session (working database). Agent contributions: audit trail (all runs)."
+  "record_basis": "Status, payments, approvals, and ending balance: kept session (working database). Agent contributions: audit trail (all runs).",
+  "status_model": "agent_outcome: complete (no open request for a person) or needs_you. ticket_status: open, pending inventory (waiting_stock), blocked, or resolved (fulfilled)."
 }

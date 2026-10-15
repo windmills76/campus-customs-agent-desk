@@ -88,6 +88,7 @@ class TicketSummary(BaseModel):
     state: Literal["open", "waiting", "blocked", "resolved"]
     overdue: bool
     pending_approvals: int
+    agent_outcome: Literal["complete", "needs_you"] = "complete"
 
 
 class ActivityEvent(BaseModel):
